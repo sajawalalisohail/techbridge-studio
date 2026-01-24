@@ -1,0 +1,8 @@
+export { default as Hero } from './Hero'
+export { default as TrustStrip, ValuesStrip } from './TrustStrip'
+export { default as ServicesGrid } from './ServicesGrid'
+export { default as SelectedWork } from './SelectedWork'
+export { default as UseCases } from './UseCases'
+export { default as ProcessSection } from './ProcessSection'
+export { default as FAQ } from './FAQ'
+export { default as FinalCTA } from './FinalCTA'
