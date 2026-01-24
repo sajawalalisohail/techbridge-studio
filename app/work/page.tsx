@@ -188,8 +188,8 @@ export default function WorkPage() {
             <Reveal>
               <p className="text-muted-foreground">
                 <strong className="text-foreground">Note:</strong> These are representative samples. 
-                Due to NDAs and client privacy, we can't show all our work publicly. 
-                We're happy to discuss relevant experience during our discovery call.
+                Due to NDAs and client privacy, we can&apos;t show all our work publicly. 
+                We&apos;re happy to discuss relevant experience during our discovery call.
               </p>
             </Reveal>
           </div>

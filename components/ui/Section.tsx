@@ -1,4 +1,4 @@
-import { ReactNode } from 'react'
+import { ReactNode, forwardRef } from 'react'
 
 interface SectionProps {
   children: ReactNode
@@ -7,12 +7,12 @@ interface SectionProps {
   id?: string
 }
 
-export default function Section({ 
+const Section = forwardRef<HTMLElement, SectionProps>(({ 
   children, 
   className = '',
   size = 'default',
   id
-}: SectionProps) {
+}, ref) => {
   const sizeClasses = {
     default: 'py-section',
     sm: 'py-section-sm',
@@ -20,8 +20,12 @@ export default function Section({
   }
 
   return (
-    <section id={id} className={`${sizeClasses[size]} ${className}`}>
+    <section ref={ref} id={id} className={`${sizeClasses[size]} ${className}`}>
       {children}
     </section>
   )
-}
+})
+
+Section.displayName = 'Section'
+
+export default Section

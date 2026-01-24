@@ -1,8 +1,8 @@
 'use client'
 
-import { useRef } from 'react'
-import { motion, useScroll, useTransform } from 'framer-motion'
-import { Container, Section, Reveal } from '@/components/ui'
+import { useRef, useState } from 'react'
+import { gsap, useGSAP, ScrollTrigger, prefersReducedMotion } from '@/lib/gsap'
+import { Container, Section } from '@/components/ui'
 
 const processSteps = [
   {
@@ -38,41 +38,94 @@ const processSteps = [
 ]
 
 export default function ProcessSection() {
+  const sectionRef = useRef<HTMLElement>(null)
+  const headerRef = useRef<HTMLDivElement>(null)
   const containerRef = useRef<HTMLDivElement>(null)
-  const { scrollYProgress } = useScroll({
-    target: containerRef,
-    offset: ['start end', 'end start'],
-  })
+  const progressRef = useRef<HTMLDivElement>(null)
+  const [activeStep, setActiveStep] = useState(0)
+
+  useGSAP(() => {
+    if (prefersReducedMotion()) return
+
+    // Header animation
+    gsap.from(headerRef.current?.children || [], {
+      opacity: 0,
+      y: 40,
+      duration: 0.8,
+      stagger: 0.1,
+      ease: 'power3.out',
+      scrollTrigger: {
+        trigger: headerRef.current,
+        start: 'top 80%',
+        once: true,
+      },
+    })
+
+    // Progress line animation
+    gsap.to(progressRef.current, {
+      scaleY: 1,
+      ease: 'none',
+      scrollTrigger: {
+        trigger: containerRef.current,
+        start: 'top center',
+        end: 'bottom center',
+        scrub: 1,
+      },
+    })
+
+    // Step animations with ScrollTrigger
+    const steps = gsap.utils.toArray<HTMLElement>('.process-step')
+    
+    steps.forEach((step, index) => {
+      // Entrance animation
+      gsap.from(step, {
+        opacity: 0,
+        x: -30,
+        duration: 0.6,
+        ease: 'power3.out',
+        scrollTrigger: {
+          trigger: step,
+          start: 'top 75%',
+          once: true,
+        },
+      })
+
+      // Active state tracking
+      ScrollTrigger.create({
+        trigger: step,
+        start: 'top center',
+        end: 'bottom center',
+        onEnter: () => setActiveStep(index),
+        onEnterBack: () => setActiveStep(index),
+      })
+    })
+
+  }, { scope: sectionRef })
 
   return (
-    <Section id="process" className="bg-muted/30">
+    <Section ref={sectionRef} id="process" className="bg-muted/30 relative">
       <Container>
-        <div className="mb-16">
-          <Reveal>
-            <p className="text-sm font-medium text-muted-foreground uppercase tracking-wider mb-4">
-              Our Process
-            </p>
-          </Reveal>
-          <Reveal delay={0.1}>
-            <h2 className="text-headline-sm md:text-headline font-semibold tracking-tight max-w-2xl">
-              How we work together.
-            </h2>
-          </Reveal>
-          <Reveal delay={0.2}>
-            <p className="text-muted-foreground mt-4 max-w-2xl">
-              A clear, predictable process that keeps you informed and in control.
-            </p>
-          </Reveal>
+        <div ref={headerRef} className="mb-16">
+          <p className="text-sm font-medium text-muted-foreground uppercase tracking-wider mb-4">
+            Our Process
+          </p>
+          <h2 className="text-headline-sm md:text-headline font-semibold tracking-tight max-w-2xl">
+            How we work together.
+          </h2>
+          <p className="text-muted-foreground mt-4 max-w-2xl">
+            A clear, predictable process that keeps you informed and in control.
+          </p>
         </div>
 
         <div ref={containerRef} className="relative">
           {/* Progress Line */}
           <div className="absolute left-0 md:left-8 top-0 bottom-0 w-px bg-border">
-            <motion.div
-              className="w-full bg-foreground origin-top"
+            <div 
+              ref={progressRef}
+              className="w-full bg-accent origin-top"
               style={{ 
-                scaleY: scrollYProgress,
                 height: '100%',
+                transform: 'scaleY(0)',
               }}
             />
           </div>
@@ -80,38 +133,53 @@ export default function ProcessSection() {
           {/* Steps */}
           <div className="space-y-16 md:space-y-24">
             {processSteps.map((step, index) => (
-              <Reveal key={step.id} delay={index * 0.1}>
-                <div className="relative pl-8 md:pl-20">
-                  {/* Step Number */}
-                  <div className="absolute left-0 md:left-8 -translate-x-1/2 w-4 h-4 rounded-full bg-background border-2 border-foreground" />
-                  
-                  <div className="grid md:grid-cols-12 gap-6">
-                    <div className="md:col-span-2">
-                      <span className="text-sm font-medium text-muted-foreground">
-                        {step.id}
-                      </span>
-                    </div>
-                    <div className="md:col-span-10">
-                      <h3 className="text-title font-semibold mb-3">
-                        {step.title}
-                      </h3>
-                      <p className="text-muted-foreground mb-4 max-w-xl">
-                        {step.description}
-                      </p>
-                      <ul className="flex flex-wrap gap-3">
-                        {step.details.map((detail) => (
-                          <li 
-                            key={detail}
-                            className="text-xs font-medium text-muted-foreground bg-background px-3 py-1.5 rounded-full border border-border"
-                          >
-                            {detail}
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
+              <div 
+                key={step.id} 
+                className={`process-step relative pl-8 md:pl-20 transition-opacity duration-500 ${
+                  index === activeStep ? 'is-active' : index < activeStep ? '' : 'is-inactive'
+                }`}
+              >
+                {/* Step Dot */}
+                <div className={`process-dot absolute left-0 md:left-8 -translate-x-1/2 w-4 h-4 rounded-full transition-all duration-500 ${
+                  index <= activeStep 
+                    ? 'bg-accent border-2 border-accent' 
+                    : 'bg-background border-2 border-border'
+                }`} />
+                
+                <div className="grid md:grid-cols-12 gap-6">
+                  <div className="md:col-span-2">
+                    <span className={`text-sm font-medium transition-colors duration-500 ${
+                      index === activeStep ? 'text-accent' : 'text-muted-foreground'
+                    }`}>
+                      {step.id}
+                    </span>
+                  </div>
+                  <div className="md:col-span-10">
+                    <h3 className={`text-title font-semibold mb-3 transition-colors duration-500 ${
+                      index === activeStep ? 'text-foreground' : ''
+                    }`}>
+                      {step.title}
+                    </h3>
+                    <p className="text-muted-foreground mb-4 max-w-xl">
+                      {step.description}
+                    </p>
+                    <ul className="flex flex-wrap gap-3">
+                      {step.details.map((detail) => (
+                        <li 
+                          key={detail}
+                          className={`text-xs font-medium px-3 py-1.5 rounded-full border transition-all duration-500 ${
+                            index === activeStep 
+                              ? 'text-accent border-accent bg-accent/10' 
+                              : 'text-muted-foreground border-border bg-background'
+                          }`}
+                        >
+                          {detail}
+                        </li>
+                      ))}
+                    </ul>
                   </div>
                 </div>
-              </Reveal>
+              </div>
             ))}
           </div>
         </div>

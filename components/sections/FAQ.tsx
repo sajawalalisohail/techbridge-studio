@@ -1,6 +1,8 @@
 'use client'
 
-import { Container, Section, Accordion, Reveal } from '@/components/ui'
+import { useRef } from 'react'
+import { gsap, useGSAP, prefersReducedMotion } from '@/lib/gsap'
+import { Container, Section, Accordion } from '@/components/ui'
 
 const faqItems = [
   {
@@ -36,23 +38,54 @@ const faqItems = [
 ]
 
 export default function FAQ() {
+  const sectionRef = useRef<HTMLElement>(null)
+  const headerRef = useRef<HTMLDivElement>(null)
+  const accordionRef = useRef<HTMLDivElement>(null)
+
+  useGSAP(() => {
+    if (prefersReducedMotion()) return
+
+    // Header animation
+    gsap.from(headerRef.current?.children || [], {
+      opacity: 0,
+      y: 40,
+      duration: 0.8,
+      stagger: 0.1,
+      ease: 'power3.out',
+      scrollTrigger: {
+        trigger: headerRef.current,
+        start: 'top 80%',
+        once: true,
+      },
+    })
+
+    // Accordion animation
+    gsap.from(accordionRef.current, {
+      opacity: 0,
+      y: 30,
+      duration: 0.8,
+      ease: 'power3.out',
+      scrollTrigger: {
+        trigger: accordionRef.current,
+        start: 'top 80%',
+        once: true,
+      },
+    })
+  }, { scope: sectionRef })
+
   return (
-    <Section id="faq">
+    <Section ref={sectionRef} id="faq">
       <Container size="sm">
-        <div className="mb-12">
-          <Reveal>
-            <p className="text-sm font-medium text-muted-foreground uppercase tracking-wider mb-4">
-              FAQ
-            </p>
-          </Reveal>
-          <Reveal delay={0.1}>
-            <h2 className="text-headline-sm md:text-headline font-semibold tracking-tight">
-              Common questions.
-            </h2>
-          </Reveal>
+        <div ref={headerRef} className="mb-12">
+          <p className="text-sm font-medium text-muted-foreground uppercase tracking-wider mb-4">
+            FAQ
+          </p>
+          <h2 className="text-headline-sm md:text-headline font-semibold tracking-tight">
+            Common questions.
+          </h2>
         </div>
 
-        <Reveal delay={0.2}>
+        <div ref={accordionRef}>
           <Accordion 
             items={faqItems.map(item => ({
               id: item.id,
@@ -60,7 +93,7 @@ export default function FAQ() {
               content: <p>{item.content}</p>,
             }))}
           />
-        </Reveal>
+        </div>
       </Container>
     </Section>
   )

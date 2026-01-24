@@ -4,6 +4,8 @@ import './globals.css'
 import LenisProvider from '@/providers/LenisProvider'
 import Navbar from '@/components/layout/Navbar'
 import Footer from '@/components/layout/Footer'
+import { AnimatedBackground } from '@/components/background'
+import ClientIntro from './ClientIntro'
 
 const inter = Inter({
   subsets: ['latin'],
@@ -42,6 +44,13 @@ export default function RootLayout({
     <html lang="en" className={inter.variable}>
       <body className="min-h-screen bg-background text-foreground antialiased">
         <LenisProvider>
+          {/* Animated background layer */}
+          <AnimatedBackground />
+          
+          {/* Intro overlay (client component) */}
+          <ClientIntro />
+          
+          {/* Main content */}
           <Navbar />
           <main>{children}</main>
           <Footer />

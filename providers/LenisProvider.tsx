@@ -1,7 +1,8 @@
 'use client'
 
-import { useEffect, useRef, ReactNode } from 'react'
+import { useEffect, useRef, useState, ReactNode } from 'react'
 import Lenis from 'lenis'
+import { LenisContext } from '@/hooks/useLenis'
 
 interface LenisProviderProps {
   children: ReactNode
@@ -9,6 +10,7 @@ interface LenisProviderProps {
 
 export default function LenisProvider({ children }: LenisProviderProps) {
   const lenisRef = useRef<Lenis | null>(null)
+  const [lenis, setLenis] = useState<Lenis | null>(null)
 
   useEffect(() => {
     // Check for reduced motion preference
@@ -31,6 +33,9 @@ export default function LenisProvider({ children }: LenisProviderProps) {
       touchMultiplier: 2,
     })
 
+    // Expose lenis instance via state for context
+    setLenis(lenisRef.current)
+
     function raf(time: number) {
       lenisRef.current?.raf(time)
       requestAnimationFrame(raf)
@@ -42,8 +47,13 @@ export default function LenisProvider({ children }: LenisProviderProps) {
     return () => {
       lenisRef.current?.destroy()
       lenisRef.current = null
+      setLenis(null)
     }
   }, [])
 
-  return <>{children}</>
+  return (
+    <LenisContext.Provider value={{ lenis }}>
+      {children}
+    </LenisContext.Provider>
+  )
 }

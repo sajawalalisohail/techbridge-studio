@@ -39,10 +39,13 @@ export default function Navbar() {
 
   return (
     <>
-      <header
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+      <motion.header
+        initial={{ y: -100, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ duration: 0.6, delay: 3.2, ease: [0.16, 1, 0.3, 1] }}
+        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
           isScrolled 
-            ? 'bg-background/80 backdrop-blur-lg border-b border-border' 
+            ? 'bg-background/80 backdrop-blur-xl border-b border-border/50' 
             : 'bg-transparent'
         }`}
       >
@@ -51,7 +54,7 @@ export default function Navbar() {
             {/* Logo */}
             <Link 
               href="/" 
-              className="text-xl font-semibold tracking-tight hover:opacity-70 transition-opacity"
+              className="text-xl font-semibold tracking-tight hover:text-accent transition-colors duration-300"
             >
               TechBridge
             </Link>
@@ -62,16 +65,17 @@ export default function Navbar() {
                 <Link
                   key={item.href}
                   href={item.href}
-                  className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+                  className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors duration-300 relative group"
                 >
                   {item.label}
+                  <span className="absolute -bottom-1 left-0 w-0 h-px bg-accent transition-all duration-300 group-hover:w-full" />
                 </Link>
               ))}
             </div>
 
             {/* Desktop CTA */}
             <div className="hidden md:block">
-              <Button href="/quote" size="sm">
+              <Button href="/quote" size="sm" className="magnetic-button">
                 Get a Quote
               </Button>
             </div>
@@ -89,10 +93,12 @@ export default function Navbar() {
                     rotate: isMobileMenuOpen ? 45 : 0,
                     y: isMobileMenuOpen ? 6 : 0,
                   }}
+                  transition={{ duration: 0.3 }}
                   className="block w-6 h-0.5 bg-foreground origin-center"
                 />
                 <motion.span
                   animate={{ opacity: isMobileMenuOpen ? 0 : 1 }}
+                  transition={{ duration: 0.2 }}
                   className="block w-6 h-0.5 bg-foreground"
                 />
                 <motion.span
@@ -100,13 +106,14 @@ export default function Navbar() {
                     rotate: isMobileMenuOpen ? -45 : 0,
                     y: isMobileMenuOpen ? -6 : 0,
                   }}
+                  transition={{ duration: 0.3 }}
                   className="block w-6 h-0.5 bg-foreground origin-center"
                 />
               </div>
             </button>
           </nav>
         </Container>
-      </header>
+      </motion.header>
 
       {/* Mobile Menu */}
       <AnimatePresence>
@@ -115,7 +122,7 @@ export default function Navbar() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.2 }}
+            transition={{ duration: 0.3 }}
             className="fixed inset-0 z-40 bg-background md:hidden"
           >
             <Container className="pt-24 pb-8 h-full flex flex-col">
@@ -125,12 +132,12 @@ export default function Navbar() {
                     key={item.href}
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: index * 0.1 }}
+                    transition={{ delay: index * 0.1, duration: 0.4 }}
                   >
                     <Link
                       href={item.href}
                       onClick={() => setIsMobileMenuOpen(false)}
-                      className="block py-4 text-3xl font-medium hover:text-muted-foreground transition-colors"
+                      className="block py-4 text-3xl font-medium hover:text-accent transition-colors duration-300"
                     >
                       {item.label}
                     </Link>
@@ -140,7 +147,7 @@ export default function Navbar() {
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.3 }}
+                transition={{ delay: 0.3, duration: 0.4 }}
               >
                 <Link 
                   href="/quote" 
