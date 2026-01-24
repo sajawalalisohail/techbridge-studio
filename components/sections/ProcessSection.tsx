@@ -45,7 +45,7 @@ export default function ProcessSection() {
   })
 
   return (
-    <Section id="process" className="bg-muted/30">
+    <Section id="process" className="bg-muted">
       <Container>
         <div className="mb-16">
           <Reveal>

@@ -35,7 +35,7 @@ const projects = [
 
 export default function SelectedWork() {
   return (
-    <Section id="work" className="bg-muted/30">
+    <Section id="work" className="bg-muted">
       <Container>
         <div className="mb-16">
           <Reveal>

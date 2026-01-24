@@ -1,6 +1,6 @@
 'use client'
 
-import { Container, Reveal } from '@/components/ui'
+import { Container, Section, Reveal } from '@/components/ui'
 
 const techStack = [
   { name: 'Next.js', description: 'React Framework' },
@@ -18,7 +18,7 @@ const values = [
 
 export default function TrustStrip() {
   return (
-    <section className="py-12 border-y border-border bg-muted/30">
+    <Section size="xs" className="border-y border-border bg-muted">
       <Container>
         <Reveal>
           <div className="flex flex-col md:flex-row items-center justify-between gap-8">
@@ -36,13 +36,13 @@ export default function TrustStrip() {
           </div>
         </Reveal>
       </Container>
-    </section>
+    </Section>
   )
 }
 
 export function ValuesStrip() {
   return (
-    <section className="py-12 border-y border-border bg-muted/30">
+    <Section size="xs" className="border-y border-border bg-muted">
       <Container>
         <Reveal>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
@@ -55,6 +55,6 @@ export function ValuesStrip() {
           </div>
         </Reveal>
       </Container>
-    </section>
+    </Section>
   )
 }
