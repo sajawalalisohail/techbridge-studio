@@ -1,8 +1,8 @@
 'use client'
 
-import { useRef } from 'react'
+import { useRef, useEffect } from 'react'
 import Link from 'next/link'
-import { gsap, useGSAP, prefersReducedMotion } from '@/lib/gsap'
+import { gsap, ScrollTrigger, prefersReducedMotion } from '@/lib/gsap'
 import Container from '@/components/ui/Container'
 
 const footerLinks = {
@@ -25,30 +25,33 @@ export default function Footer() {
   const footerRef = useRef<HTMLElement>(null)
   const contentRef = useRef<HTMLDivElement>(null)
 
-  useGSAP(() => {
+  useEffect(() => {
     if (prefersReducedMotion()) return
 
-    gsap.from(contentRef.current?.children || [], {
-      opacity: 0,
-      y: 30,
-      duration: 0.8,
-      stagger: 0.1,
-      ease: 'power3.out',
-      scrollTrigger: {
-        trigger: footerRef.current,
-        start: 'top 85%',
-        once: true,
-      },
-    })
-  }, { scope: footerRef })
+    const ctx = gsap.context(() => {
+      // Reveal animation
+      if (footerRef.current) {
+        gsap.from(footerRef.current, {
+          opacity: 0,
+          y: 30,
+          duration: 0.6,
+          ease: 'power3.out',
+          scrollTrigger: {
+            trigger: footerRef.current,
+            start: 'top 95%',
+            once: true,
+          },
+        })
+      }
+    }, footerRef)
+
+    return () => ctx.revert()
+  }, [])
 
   return (
-    <footer ref={footerRef} className="border-t border-border bg-muted/30 relative overflow-hidden">
-      {/* Decorative gradient */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[300px] bg-gradient-radial from-accent/5 to-transparent pointer-events-none" />
-      
+    <footer ref={footerRef} className="border-t border-border bg-muted/50">
       <Container>
-        <div ref={contentRef} className="py-16 md:py-20 relative">
+        <div ref={contentRef} className="py-16 md:py-20">
           {/* Main Footer Content */}
           <div className="grid grid-cols-1 md:grid-cols-12 gap-12 md:gap-8">
             {/* Brand Column */}
@@ -59,18 +62,21 @@ export default function Footer() {
               >
                 TechBridge
               </Link>
-              <p className="text-muted-foreground max-w-sm mb-6">
+              <p className="text-muted-foreground max-w-sm mb-6 text-sm leading-relaxed">
                 Ship fast. Build clean. Automate operations. 
                 We build software that removes manual work and helps businesses scale.
               </p>
-              <p className="text-sm text-muted-foreground hover:text-accent transition-colors duration-300">
-                <a href="mailto:hello@techbridge.dev">hello@techbridge.dev</a>
-              </p>
+              <a 
+                href="mailto:hello@techbridge.dev"
+                className="text-sm text-muted-foreground hover:text-accent transition-colors duration-300"
+              >
+                hello@techbridge.dev
+              </a>
             </div>
 
             {/* Links Columns */}
             <div className="md:col-span-3 md:col-start-7">
-              <h4 className="font-medium mb-4">Company</h4>
+              <h4 className="font-medium mb-4 text-sm">Company</h4>
               <ul className="space-y-3">
                 {footerLinks.company.map((link) => (
                   <li key={link.href}>
@@ -86,7 +92,7 @@ export default function Footer() {
             </div>
 
             <div className="md:col-span-3">
-              <h4 className="font-medium mb-4">Services</h4>
+              <h4 className="font-medium mb-4 text-sm">Services</h4>
               <ul className="space-y-3">
                 {footerLinks.services.map((link) => (
                   <li key={link.href}>

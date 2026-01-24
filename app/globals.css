@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 /* ============================================
-   CSS VARIABLES - DARK THEME FOCUSED
+   CSS VARIABLES - DARK THEME
    ============================================ */
 :root {
   --background: #050505;
@@ -14,20 +14,6 @@
   --accent: #6366f1;
   --accent-secondary: #8b5cf6;
   --accent-foreground: #fafafa;
-}
-
-/* Light mode override (optional - can remove for dark-only) */
-@media (prefers-color-scheme: light) {
-  :root {
-    --background: #050505;
-    --foreground: #fafafa;
-    --muted: #0a0a0a;
-    --muted-foreground: #a3a3a3;
-    --border: #1a1a1a;
-    --accent: #6366f1;
-    --accent-secondary: #8b5cf6;
-    --accent-foreground: #fafafa;
-  }
 }
 
 /* ============================================
@@ -50,10 +36,6 @@ html.lenis body {
   overflow: hidden;
 }
 
-.lenis.lenis-smooth iframe {
-  pointer-events: none;
-}
-
 /* ============================================
    BASE STYLES
    ============================================ */
@@ -63,21 +45,19 @@ html.lenis body {
   margin: 0;
 }
 
+/* Remove conflicting scroll-behavior */
 html {
-  scroll-behavior: smooth;
+  scroll-behavior: auto;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  html {
-    scroll-behavior: auto;
-  }
-  
   *,
   *::before,
   *::after {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
 }
 
@@ -108,7 +88,7 @@ a {
   text-decoration: none;
 }
 
-/* Smooth Image Loading */
+/* Images */
 img {
   max-width: 100%;
   height: auto;
@@ -133,7 +113,7 @@ img {
 }
 
 /* ============================================
-   INTRO OVERLAY STYLES
+   INTRO OVERLAY
    ============================================ */
 .intro-overlay {
   position: fixed;
@@ -143,7 +123,6 @@ img {
   display: flex;
   align-items: center;
   justify-content: center;
-  will-change: transform;
 }
 
 .intro-content {
@@ -168,7 +147,6 @@ img {
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  will-change: opacity, transform, background-position;
 }
 
 .intro-subtext {
@@ -178,7 +156,6 @@ img {
   text-transform: uppercase;
   color: var(--muted-foreground);
   margin-top: 1rem;
-  will-change: opacity, transform;
 }
 
 /* ============================================
@@ -192,83 +169,76 @@ img {
   background: var(--background);
 }
 
-/* Gradient orbs with slow ambient movement */
 .gradient-orb {
   position: absolute;
   border-radius: 50%;
   filter: blur(120px);
-  opacity: 0.12;
-  will-change: transform;
+  opacity: 0.1;
   pointer-events: none;
 }
 
 .gradient-orb-1 {
-  width: 70vw;
-  height: 70vw;
-  max-width: 800px;
-  max-height: 800px;
-  background: radial-gradient(circle, var(--accent) 0%, transparent 70%);
-  top: -25%;
-  left: -15%;
-  animation: float1 25s ease-in-out infinite;
-}
-
-.gradient-orb-2 {
   width: 60vw;
   height: 60vw;
   max-width: 700px;
   max-height: 700px;
+  background: radial-gradient(circle, var(--accent) 0%, transparent 70%);
+  top: -20%;
+  left: -10%;
+  animation: float1 30s ease-in-out infinite;
+}
+
+.gradient-orb-2 {
+  width: 50vw;
+  height: 50vw;
+  max-width: 600px;
+  max-height: 600px;
   background: radial-gradient(circle, var(--accent-secondary) 0%, transparent 70%);
-  bottom: -20%;
-  right: -15%;
-  animation: float2 30s ease-in-out infinite;
+  bottom: -15%;
+  right: -10%;
+  animation: float2 35s ease-in-out infinite;
 }
 
 .gradient-orb-3 {
-  width: 40vw;
-  height: 40vw;
-  max-width: 500px;
-  max-height: 500px;
+  width: 35vw;
+  height: 35vw;
+  max-width: 400px;
+  max-height: 400px;
   background: radial-gradient(circle, #3b82f6 0%, transparent 70%);
-  top: 40%;
+  top: 50%;
   left: 50%;
-  transform: translateX(-50%);
-  animation: float3 20s ease-in-out infinite;
-  opacity: 0.08;
+  transform: translate(-50%, -50%);
+  animation: float3 25s ease-in-out infinite;
+  opacity: 0.06;
 }
 
 @keyframes float1 {
-  0%, 100% { transform: translate(0, 0) scale(1); }
-  25% { transform: translate(40px, -30px) scale(1.05); }
-  50% { transform: translate(20px, 20px) scale(0.98); }
-  75% { transform: translate(-30px, 10px) scale(1.02); }
+  0%, 100% { transform: translate(0, 0); }
+  50% { transform: translate(30px, 20px); }
 }
 
 @keyframes float2 {
-  0%, 100% { transform: translate(0, 0) scale(1); }
-  25% { transform: translate(-30px, 20px) scale(0.97); }
-  50% { transform: translate(-50px, -30px) scale(1.03); }
-  75% { transform: translate(20px, -20px) scale(1); }
+  0%, 100% { transform: translate(0, 0); }
+  50% { transform: translate(-25px, -20px); }
 }
 
 @keyframes float3 {
-  0%, 100% { transform: translateX(-50%) translate(0, 0) scale(1); }
-  33% { transform: translateX(-50%) translate(30px, -40px) scale(1.1); }
-  66% { transform: translateX(-50%) translate(-20px, 30px) scale(0.95); }
+  0%, 100% { transform: translate(-50%, -50%); }
+  50% { transform: translate(-50%, -50%) translate(20px, -25px); }
 }
 
-/* Noise overlay using SVG filter */
+/* Noise overlay */
 .noise-overlay {
   position: absolute;
   inset: 0;
-  opacity: 0.035;
+  opacity: 0.03;
   pointer-events: none;
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
   background-repeat: repeat;
   background-size: 256px 256px;
 }
 
-/* Vignette effect */
+/* Vignette */
 .vignette-overlay {
   position: absolute;
   inset: 0;
@@ -276,211 +246,23 @@ img {
   background: radial-gradient(
     ellipse at center,
     transparent 0%,
-    transparent 50%,
-    rgba(0, 0, 0, 0.4) 100%
+    transparent 60%,
+    rgba(0, 0, 0, 0.3) 100%
   );
 }
 
 /* ============================================
-   HERO SECTION ANIMATIONS
-   ============================================ */
-.hero-headline {
-  will-change: opacity, transform;
-}
-
-.hero-subhead {
-  will-change: opacity, transform;
-}
-
-.hero-cta {
-  will-change: opacity, transform;
-}
-
-/* ============================================
-   SERVICE CARD ENHANCEMENTS
+   CARD STYLES
    ============================================ */
 .service-card {
   position: relative;
-  transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1),
-              box-shadow 0.5s cubic-bezier(0.16, 1, 0.3, 1),
-              border-color 0.3s ease;
-}
-
-.service-card::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  padding: 1px;
-  background: linear-gradient(
-    135deg,
-    transparent 0%,
-    transparent 40%,
-    var(--accent) 50%,
-    transparent 60%,
-    transparent 100%
-  );
-  background-size: 400% 400%;
-  background-position: 0% 0%;
-  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-  -webkit-mask-composite: xor;
-  mask-composite: exclude;
-  opacity: 0;
-  transition: opacity 0.4s ease, background-position 0.8s ease;
-  pointer-events: none;
+  transition: transform 0.4s ease, box-shadow 0.4s ease, border-color 0.3s ease;
 }
 
 .service-card:hover {
-  transform: translateY(-8px);
-  box-shadow: 0 20px 40px -20px rgba(99, 102, 241, 0.25);
+  transform: translateY(-4px);
+  box-shadow: 0 16px 32px -16px rgba(99, 102, 241, 0.2);
   border-color: var(--accent);
-}
-
-.service-card:hover::before {
-  opacity: 1;
-  background-position: 100% 100%;
-}
-
-.service-card-icon {
-  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.service-card:hover .service-card-icon {
-  transform: scale(1.1);
-}
-
-/* ============================================
-   WORK CARD ENHANCEMENTS
-   ============================================ */
-.work-card {
-  position: relative;
-  overflow: hidden;
-}
-
-.work-card-image-wrapper {
-  position: relative;
-  overflow: hidden;
-}
-
-.work-card-image {
-  transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.work-card:hover .work-card-image {
-  transform: scale(1.05);
-}
-
-.work-card-overlay {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(
-    to top,
-    rgba(0, 0, 0, 0.8) 0%,
-    transparent 50%
-  );
-  opacity: 0;
-  transition: opacity 0.4s ease;
-}
-
-.work-card:hover .work-card-overlay {
-  opacity: 1;
-}
-
-.work-card-title {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  padding: 1.5rem;
-  transform: translateY(20px);
-  opacity: 0;
-  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1),
-              opacity 0.4s ease;
-}
-
-.work-card:hover .work-card-title {
-  transform: translateY(0);
-  opacity: 1;
-}
-
-/* ============================================
-   PROCESS SECTION ENHANCEMENTS
-   ============================================ */
-.process-step {
-  transition: opacity 0.4s ease;
-}
-
-.process-step.is-inactive {
-  opacity: 0.4;
-}
-
-.process-step.is-active {
-  opacity: 1;
-}
-
-.process-dot {
-  position: relative;
-}
-
-.process-dot::after {
-  content: '';
-  position: absolute;
-  inset: -4px;
-  border-radius: 50%;
-  background: var(--accent);
-  opacity: 0;
-  transform: scale(0.5);
-  transition: opacity 0.4s ease, transform 0.4s ease;
-}
-
-.process-step.is-active .process-dot::after {
-  opacity: 0.3;
-  transform: scale(1);
-  animation: pulse 2s ease-in-out infinite;
-}
-
-@keyframes pulse {
-  0%, 100% { opacity: 0.3; transform: scale(1); }
-  50% { opacity: 0.1; transform: scale(1.5); }
-}
-
-/* ============================================
-   CTA SECTION ENHANCEMENTS
-   ============================================ */
-.cta-section {
-  position: relative;
-  overflow: hidden;
-}
-
-.cta-section::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(
-    135deg,
-    var(--accent) 0%,
-    var(--accent-secondary) 100%
-  );
-  opacity: 0.1;
-  animation: ctaPulse 8s ease-in-out infinite;
-}
-
-@keyframes ctaPulse {
-  0%, 100% { opacity: 0.1; }
-  50% { opacity: 0.15; }
-}
-
-/* ============================================
-   MAGNETIC BUTTON EFFECT
-   ============================================ */
-.magnetic-button {
-  position: relative;
-  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.magnetic-button:hover {
-  transform: scale(1.02);
 }
 
 /* ============================================
@@ -504,33 +286,4 @@ img {
     -webkit-text-fill-color: transparent;
     background-clip: text;
   }
-  
-  /* GPU acceleration helper */
-  .gpu {
-    transform: translateZ(0);
-    backface-visibility: hidden;
-  }
-}
-
-/* ============================================
-   PAGE TRANSITION STYLES
-   ============================================ */
-.page-transition-enter {
-  opacity: 0;
-  transform: translateY(20px);
-}
-
-.page-transition-enter-active {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-.page-transition-exit {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-.page-transition-exit-active {
-  opacity: 0;
-  transform: translateY(-20px);
 }

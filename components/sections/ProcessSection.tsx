@@ -1,7 +1,7 @@
 'use client'
 
-import { useRef, useState } from 'react'
-import { gsap, useGSAP, ScrollTrigger, prefersReducedMotion } from '@/lib/gsap'
+import { useRef, useState, useEffect, useCallback } from 'react'
+import { gsap, ScrollTrigger, prefersReducedMotion } from '@/lib/gsap'
 import { Container, Section } from '@/components/ui'
 
 const processSteps = [
@@ -39,74 +39,100 @@ const processSteps = [
 
 export default function ProcessSection() {
   const sectionRef = useRef<HTMLElement>(null)
-  const headerRef = useRef<HTMLDivElement>(null)
   const containerRef = useRef<HTMLDivElement>(null)
   const progressRef = useRef<HTMLDivElement>(null)
+  const stepsRef = useRef<(HTMLDivElement | null)[]>([])
+  const headerRef = useRef<HTMLDivElement>(null)
   const [activeStep, setActiveStep] = useState(0)
+  const triggersRef = useRef<ScrollTrigger[]>([])
 
-  useGSAP(() => {
+  // Stable callback for setting active step
+  const updateActiveStep = useCallback((index: number) => {
+    setActiveStep(index)
+  }, [])
+
+  useEffect(() => {
     if (prefersReducedMotion()) return
 
-    // Header animation
-    gsap.from(headerRef.current?.children || [], {
-      opacity: 0,
-      y: 40,
-      duration: 0.8,
-      stagger: 0.1,
-      ease: 'power3.out',
-      scrollTrigger: {
-        trigger: headerRef.current,
-        start: 'top 80%',
-        once: true,
-      },
-    })
+    const ctx = gsap.context(() => {
+      // Header animation
+      if (headerRef.current) {
+        gsap.from(headerRef.current.children, {
+          opacity: 0,
+          y: 30,
+          duration: 0.6,
+          stagger: 0.1,
+          ease: 'power3.out',
+          scrollTrigger: {
+            trigger: headerRef.current,
+            start: 'top 85%',
+            once: true,
+          },
+        })
+      }
 
-    // Progress line animation
-    gsap.to(progressRef.current, {
-      scaleY: 1,
-      ease: 'none',
-      scrollTrigger: {
-        trigger: containerRef.current,
-        start: 'top center',
-        end: 'bottom center',
-        scrub: 1,
-      },
-    })
+      // Progress line animation
+      if (progressRef.current && containerRef.current) {
+        const progressTrigger = ScrollTrigger.create({
+          trigger: containerRef.current,
+          start: 'top 60%',
+          end: 'bottom 40%',
+          scrub: 0.5,
+          onUpdate: (self) => {
+            gsap.set(progressRef.current, { scaleY: self.progress })
+          }
+        })
+        triggersRef.current.push(progressTrigger)
+      }
 
-    // Step animations with ScrollTrigger
-    const steps = gsap.utils.toArray<HTMLElement>('.process-step')
-    
-    steps.forEach((step, index) => {
-      // Entrance animation
-      gsap.from(step, {
-        opacity: 0,
-        x: -30,
-        duration: 0.6,
-        ease: 'power3.out',
-        scrollTrigger: {
+      // Step triggers
+      stepsRef.current.forEach((step, index) => {
+        if (!step) return
+
+        // Entrance animation
+        gsap.from(step, {
+          opacity: 0,
+          x: -20,
+          duration: 0.6,
+          ease: 'power3.out',
+          scrollTrigger: {
+            trigger: step,
+            start: 'top 80%',
+            once: true,
+          },
+        })
+
+        // Active state tracking
+        const stepTrigger = ScrollTrigger.create({
           trigger: step,
-          start: 'top 75%',
-          once: true,
-        },
+          start: 'top 55%',
+          end: 'bottom 45%',
+          onEnter: () => updateActiveStep(index),
+          onEnterBack: () => updateActiveStep(index),
+        })
+        triggersRef.current.push(stepTrigger)
       })
+    }, sectionRef)
 
-      // Active state tracking
-      ScrollTrigger.create({
-        trigger: step,
-        start: 'top center',
-        end: 'bottom center',
-        onEnter: () => setActiveStep(index),
-        onEnterBack: () => setActiveStep(index),
+    // Refresh after fonts load
+    if (document.fonts) {
+      document.fonts.ready.then(() => {
+        ScrollTrigger.refresh()
       })
-    })
+    }
 
-  }, { scope: sectionRef })
+    return () => {
+      ctx.revert()
+      triggersRef.current.forEach(t => t.kill())
+      triggersRef.current = []
+    }
+  }, [updateActiveStep])
 
   return (
-    <Section ref={sectionRef} id="process" className="bg-muted/30 relative">
+    <Section ref={sectionRef} id="process" className="bg-muted/50">
       <Container>
         <div ref={headerRef} className="mb-16">
-          <p className="text-sm font-medium text-muted-foreground uppercase tracking-wider mb-4">
+          <p className="text-sm font-medium text-accent uppercase tracking-wider mb-4">
             Our Process
           </p>
           <h2 className="text-headline-sm md:text-headline font-semibold tracking-tight max-w-2xl">
@@ -131,45 +157,50 @@ export default function ProcessSection() {
           </div>
 
           {/* Steps */}
-          <div className="space-y-16 md:space-y-24">
+          <div className="space-y-16 md:space-y-20">
             {processSteps.map((step, index) => (
               <div 
-                key={step.id} 
-                className={`process-step relative pl-8 md:pl-20 transition-opacity duration-500 ${
-                  index === activeStep ? 'is-active' : index < activeStep ? '' : 'is-inactive'
+                key={step.id}
+                ref={(el) => { stepsRef.current[index] = el }}
+                className={`relative pl-8 md:pl-20 transition-opacity duration-300 ${
+                  index === activeStep ? 'opacity-100' : 'opacity-50'
                 }`}
               >
                 {/* Step Dot */}
-                <div className={`process-dot absolute left-0 md:left-8 -translate-x-1/2 w-4 h-4 rounded-full transition-all duration-500 ${
+                <div className={`absolute left-0 md:left-8 -translate-x-1/2 w-3 h-3 rounded-full transition-all duration-300 ${
                   index <= activeStep 
-                    ? 'bg-accent border-2 border-accent' 
-                    : 'bg-background border-2 border-border'
-                }`} />
+                    ? 'bg-accent scale-125' 
+                    : 'bg-border'
+                }`}>
+                  {index === activeStep && (
+                    <span className="absolute inset-0 rounded-full bg-accent animate-ping opacity-30" />
+                  )}
+                </div>
                 
-                <div className="grid md:grid-cols-12 gap-6">
+                <div className="grid md:grid-cols-12 gap-4 md:gap-6">
                   <div className="md:col-span-2">
-                    <span className={`text-sm font-medium transition-colors duration-500 ${
+                    <span className={`text-sm font-mono transition-colors duration-300 ${
                       index === activeStep ? 'text-accent' : 'text-muted-foreground'
                     }`}>
                       {step.id}
                     </span>
                   </div>
                   <div className="md:col-span-10">
-                    <h3 className={`text-title font-semibold mb-3 transition-colors duration-500 ${
-                      index === activeStep ? 'text-foreground' : ''
+                    <h3 className={`text-xl font-semibold mb-2 transition-colors duration-300 ${
+                      index === activeStep ? 'text-foreground' : 'text-muted-foreground'
                     }`}>
                       {step.title}
                     </h3>
-                    <p className="text-muted-foreground mb-4 max-w-xl">
+                    <p className="text-muted-foreground mb-4 max-w-xl text-sm leading-relaxed">
                       {step.description}
                     </p>
-                    <ul className="flex flex-wrap gap-3">
+                    <ul className="flex flex-wrap gap-2">
                       {step.details.map((detail) => (
                         <li 
                           key={detail}
-                          className={`text-xs font-medium px-3 py-1.5 rounded-full border transition-all duration-500 ${
+                          className={`text-xs font-medium px-3 py-1 rounded-full border transition-all duration-300 ${
                             index === activeStep 
-                              ? 'text-accent border-accent bg-accent/10' 
+                              ? 'text-accent border-accent/50 bg-accent/10' 
                               : 'text-muted-foreground border-border bg-background'
                           }`}
                         >

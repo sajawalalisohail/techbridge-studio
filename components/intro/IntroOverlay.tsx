@@ -1,7 +1,7 @@
 'use client'
 
-import { useRef, useState, useEffect } from 'react'
-import { gsap, useGSAP, prefersReducedMotion, isMobile } from '@/lib/gsap'
+import { useRef, useEffect } from 'react'
+import { gsap } from 'gsap'
 import { useLenis } from '@/hooks/useLenis'
 
 interface IntroOverlayProps {
@@ -12,74 +12,80 @@ export default function IntroOverlay({ onComplete }: IntroOverlayProps) {
   const overlayRef = useRef<HTMLDivElement>(null)
   const textRef = useRef<HTMLDivElement>(null)
   const subtextRef = useRef<HTMLDivElement>(null)
-  const [isVisible, setIsVisible] = useState(true)
+  const timelineRef = useRef<gsap.core.Timeline | null>(null)
   const { lenis } = useLenis()
 
   useEffect(() => {
-    // Skip intro on mobile or reduced motion
-    if (prefersReducedMotion() || isMobile()) {
-      setIsVisible(false)
+    const overlay = overlayRef.current
+    const text = textRef.current
+    const subtext = subtextRef.current
+
+    if (!overlay || !text || !subtext) {
+      // If refs not ready, complete immediately
+      lenis?.start()
       onComplete?.()
       return
     }
 
-    // Pause scroll during intro
+    // Stop scroll during intro
     lenis?.stop()
-  }, [lenis, onComplete])
 
-  useGSAP(() => {
-    // Skip if not visible or reduced motion
-    if (!isVisible || prefersReducedMotion() || isMobile()) {
-      return
-    }
+    // Set initial states
+    gsap.set(text, { opacity: 0, scale: 0.9 })
+    gsap.set(subtext, { opacity: 0, y: 15 })
+    gsap.set(overlay, { yPercent: 0 })
 
+    // Create timeline with fallback timeout
     const tl = gsap.timeline({
       onComplete: () => {
         lenis?.start()
-        setIsVisible(false)
         onComplete?.()
       }
     })
 
-    // Initial state
-    gsap.set(textRef.current, { opacity: 0, scale: 0.95 })
-    gsap.set(subtextRef.current, { opacity: 0, y: 20 })
+    timelineRef.current = tl
 
-    // Animation sequence
     tl
-      // Fade in brand name
-      .to(textRef.current, {
+      .to(text, {
         opacity: 1,
         scale: 1,
-        duration: 0.8,
-        ease: 'power2.out',
-        delay: 0.3,
-      })
-      // Gradient sweep through text
-      .to(textRef.current, {
-        backgroundPosition: '100% 0',
         duration: 0.7,
-        ease: 'power1.inOut',
+        ease: 'power2.out',
+        delay: 0.2,
       })
-      // Fade in subtext
-      .to(subtextRef.current, {
+      .to(text, {
+        backgroundPosition: '100% 0',
+        duration: 0.6,
+        ease: 'power1.inOut',
+      }, '-=0.2')
+      .to(subtext, {
         opacity: 1,
         y: 0,
-        duration: 0.5,
+        duration: 0.4,
         ease: 'power2.out',
       }, '-=0.3')
-      // Hold for impact
-      .to({}, { duration: 0.4 })
-      // Slide overlay up
-      .to(overlayRef.current, {
+      .to({}, { duration: 0.3 })
+      .to(overlay, {
         yPercent: -100,
-        duration: 0.8,
+        duration: 0.7,
         ease: 'power3.inOut',
       })
 
-  }, { dependencies: [isVisible, lenis], scope: overlayRef })
+    // Fallback: force complete after 4 seconds max
+    const fallbackTimer = setTimeout(() => {
+      if (timelineRef.current) {
+        timelineRef.current.kill()
+      }
+      gsap.set(overlay, { yPercent: -100, opacity: 0 })
+      lenis?.start()
+      onComplete?.()
+    }, 4000)
 
-  if (!isVisible) return null
+    return () => {
+      tl.kill()
+      clearTimeout(fallbackTimer)
+    }
+  }, [lenis, onComplete])
 
   return (
     <div

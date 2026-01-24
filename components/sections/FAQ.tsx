@@ -1,7 +1,7 @@
 'use client'
 
-import { useRef } from 'react'
-import { gsap, useGSAP, prefersReducedMotion } from '@/lib/gsap'
+import { useRef, useEffect } from 'react'
+import { gsap, ScrollTrigger, prefersReducedMotion } from '@/lib/gsap'
 import { Container, Section, Accordion } from '@/components/ui'
 
 const faqItems = [
@@ -42,42 +42,50 @@ export default function FAQ() {
   const headerRef = useRef<HTMLDivElement>(null)
   const accordionRef = useRef<HTMLDivElement>(null)
 
-  useGSAP(() => {
+  useEffect(() => {
     if (prefersReducedMotion()) return
 
-    // Header animation
-    gsap.from(headerRef.current?.children || [], {
-      opacity: 0,
-      y: 40,
-      duration: 0.8,
-      stagger: 0.1,
-      ease: 'power3.out',
-      scrollTrigger: {
-        trigger: headerRef.current,
-        start: 'top 80%',
-        once: true,
-      },
-    })
+    const ctx = gsap.context(() => {
+      // Header animation
+      if (headerRef.current) {
+        gsap.from(headerRef.current.children, {
+          opacity: 0,
+          y: 30,
+          duration: 0.6,
+          stagger: 0.1,
+          ease: 'power3.out',
+          scrollTrigger: {
+            trigger: headerRef.current,
+            start: 'top 85%',
+            once: true,
+          },
+        })
+      }
 
-    // Accordion animation
-    gsap.from(accordionRef.current, {
-      opacity: 0,
-      y: 30,
-      duration: 0.8,
-      ease: 'power3.out',
-      scrollTrigger: {
-        trigger: accordionRef.current,
-        start: 'top 80%',
-        once: true,
-      },
-    })
-  }, { scope: sectionRef })
+      // Accordion animation
+      if (accordionRef.current) {
+        gsap.from(accordionRef.current, {
+          opacity: 0,
+          y: 20,
+          duration: 0.6,
+          ease: 'power3.out',
+          scrollTrigger: {
+            trigger: accordionRef.current,
+            start: 'top 85%',
+            once: true,
+          },
+        })
+      }
+    }, sectionRef)
+
+    return () => ctx.revert()
+  }, [])
 
   return (
     <Section ref={sectionRef} id="faq">
       <Container size="sm">
-        <div ref={headerRef} className="mb-12">
-          <p className="text-sm font-medium text-muted-foreground uppercase tracking-wider mb-4">
+        <div ref={headerRef} className="mb-10">
+          <p className="text-sm font-medium text-accent uppercase tracking-wider mb-4">
             FAQ
           </p>
           <h2 className="text-headline-sm md:text-headline font-semibold tracking-tight">
@@ -90,7 +98,7 @@ export default function FAQ() {
             items={faqItems.map(item => ({
               id: item.id,
               title: item.title,
-              content: <p>{item.content}</p>,
+              content: <p className="text-sm leading-relaxed">{item.content}</p>,
             }))}
           />
         </div>

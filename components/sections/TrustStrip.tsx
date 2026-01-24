@@ -1,7 +1,7 @@
 'use client'
 
-import { useRef } from 'react'
-import { gsap, useGSAP, prefersReducedMotion } from '@/lib/gsap'
+import { useRef, useEffect } from 'react'
+import { gsap, ScrollTrigger, prefersReducedMotion } from '@/lib/gsap'
 import { Container } from '@/components/ui'
 
 const techStack = [
@@ -15,76 +15,45 @@ export default function TrustStrip() {
   const sectionRef = useRef<HTMLElement>(null)
   const itemsRef = useRef<HTMLDivElement>(null)
 
-  useGSAP(() => {
-    if (prefersReducedMotion()) return
+  useEffect(() => {
+    if (prefersReducedMotion() || !itemsRef.current) return
 
-    const items = itemsRef.current?.children
-    if (items) {
-      gsap.from(items, {
+    const ctx = gsap.context(() => {
+      gsap.from(itemsRef.current?.children || [], {
         opacity: 0,
         y: 20,
-        duration: 0.6,
-        stagger: 0.1,
+        duration: 0.5,
+        stagger: 0.08,
         ease: 'power3.out',
         scrollTrigger: {
           trigger: sectionRef.current,
-          start: 'top 85%',
+          start: 'top 90%',
           once: true,
         },
       })
-    }
-  }, { scope: sectionRef })
+    }, sectionRef)
+
+    return () => ctx.revert()
+  }, [])
 
   return (
-    <section ref={sectionRef} className="py-12 border-y border-border bg-muted/30 relative overflow-hidden">
-      {/* Subtle gradient line */}
-      <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-accent/30 to-transparent" />
-      
+    <section ref={sectionRef} className="py-10 border-y border-border bg-muted/30">
       <Container>
-        <div className="flex flex-col md:flex-row items-center justify-between gap-8">
+        <div className="flex flex-col md:flex-row items-center justify-between gap-6">
           <p className="text-sm text-muted-foreground font-medium uppercase tracking-wider">
             Built with modern tools
           </p>
-          <div ref={itemsRef} className="flex flex-wrap items-center justify-center gap-8 md:gap-12">
+          <div ref={itemsRef} className="flex flex-wrap items-center justify-center gap-8 md:gap-10">
             {techStack.map((item) => (
               <div 
                 key={item.name} 
-                className="text-center md:text-left group cursor-default"
+                className="text-center md:text-left"
               >
-                <p className="font-medium group-hover:text-accent transition-colors duration-300">
-                  {item.name}
-                </p>
+                <p className="font-medium text-sm">{item.name}</p>
                 <p className="text-xs text-muted-foreground">{item.description}</p>
               </div>
             ))}
           </div>
-        </div>
-      </Container>
-      
-      {/* Subtle gradient line */}
-      <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-accent/30 to-transparent" />
-    </section>
-  )
-}
-
-export function ValuesStrip() {
-  const values = [
-    { name: 'Speed', description: 'Ship in weeks, not months' },
-    { name: 'Clarity', description: 'No surprises, no scope creep' },
-    { name: 'Quality', description: 'Production-ready code' },
-    { name: 'Support', description: 'We stick around' },
-  ]
-
-  return (
-    <section className="py-12 border-y border-border bg-muted/30">
-      <Container>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-          {values.map((item) => (
-            <div key={item.name} className="text-center">
-              <p className="font-semibold text-lg mb-1">{item.name}</p>
-              <p className="text-sm text-muted-foreground">{item.description}</p>
-            </div>
-          ))}
         </div>
       </Container>
     </section>

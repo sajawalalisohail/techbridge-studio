@@ -2,21 +2,18 @@
 
 import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
-import { useGSAP } from '@gsap/react'
 
 // Register GSAP plugins
 if (typeof window !== 'undefined') {
-  gsap.registerPlugin(ScrollTrigger, useGSAP)
+  gsap.registerPlugin(ScrollTrigger)
 }
 
-// Default easing curves for consistent motion
+// Default easing curves
 export const easings = {
   smooth: 'power3.out',
   smoothInOut: 'power3.inOut',
   bounce: 'back.out(1.7)',
   expo: 'expo.out',
-  // Matches Framer Motion's default
-  framer: [0.16, 1, 0.3, 1],
 }
 
 // Default durations
@@ -39,14 +36,14 @@ export const isMobile = () => {
   return window.innerWidth < 1024
 }
 
-// Kill all ScrollTriggers (useful for cleanup)
+// Kill all ScrollTriggers
 export const killAllScrollTriggers = () => {
   ScrollTrigger.getAll().forEach(trigger => trigger.kill())
 }
 
-// Refresh ScrollTrigger (useful after dynamic content loads)
+// Refresh ScrollTrigger
 export const refreshScrollTrigger = () => {
   ScrollTrigger.refresh()
 }
 
-export { gsap, ScrollTrigger, useGSAP }
+export { gsap, ScrollTrigger }
