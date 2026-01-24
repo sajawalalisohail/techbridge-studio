@@ -1,7 +1,7 @@
 'use client'
 
-import { ReactNode, useRef } from 'react'
-import { motion, useInView, Variants } from 'framer-motion'
+import { ReactNode, useEffect, useRef, useState } from 'react'
+import { motion, useInView, useReducedMotion, Variants } from 'framer-motion'
 
 interface RevealProps {
   children: ReactNode
@@ -17,15 +17,17 @@ export default function Reveal({
   children,
   className = '',
   delay = 0,
-  duration = 0.6,
+  duration = 0.45,
   direction = 'up',
-  distance = 30,
+  distance = 16,
   once = true,
 }: RevealProps) {
   const ref = useRef<HTMLDivElement>(null)
+  const [mounted, setMounted] = useState(false)
+  const prefersReducedMotion = useReducedMotion()
   const isInView = useInView(ref, { 
     once, 
-    margin: '-50px',
+    margin: '0px 0px -20% 0px',
   })
 
   const getInitialPosition = () => {
@@ -45,21 +47,31 @@ export default function Reveal({
     }
   }
 
-  const variants: Variants = {
-    hidden: {
-      opacity: 0,
-      ...getInitialPosition(),
-    },
-    visible: {
-      opacity: 1,
-      x: 0,
-      y: 0,
-      transition: {
-        duration,
-        delay,
-        ease: [0.16, 1, 0.3, 1],
-      },
-    },
+  const variants: Variants = prefersReducedMotion
+    ? { hidden: { opacity: 1 }, visible: { opacity: 1 } }
+    : {
+        hidden: {
+          opacity: 0.92,
+          ...getInitialPosition(),
+        },
+        visible: {
+          opacity: 1,
+          x: 0,
+          y: 0,
+          transition: {
+            duration,
+            delay,
+            ease: [0.16, 1, 0.3, 1],
+          },
+        },
+      }
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  if (!mounted) {
+    return <div className={className}>{children}</div>
   }
 
   return (
@@ -85,19 +97,31 @@ interface StaggerContainerProps {
 export function StaggerContainer({ 
   children, 
   className = '',
-  staggerDelay = 0.1
+  staggerDelay = 0.08
 }: StaggerContainerProps) {
   const ref = useRef<HTMLDivElement>(null)
-  const isInView = useInView(ref, { once: true, margin: '-50px' })
+  const [mounted, setMounted] = useState(false)
+  const prefersReducedMotion = useReducedMotion()
+  const isInView = useInView(ref, { once: true, margin: '0px 0px -20% 0px' })
 
   const containerVariants: Variants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: staggerDelay,
-      },
-    },
+    hidden: { opacity: 1 },
+    visible: prefersReducedMotion
+      ? { opacity: 1 }
+      : {
+          opacity: 1,
+          transition: {
+            staggerChildren: staggerDelay,
+          },
+        },
+  }
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  if (!mounted) {
+    return <div className={className}>{children}</div>
   }
 
   return (
@@ -120,19 +144,31 @@ interface StaggerItemProps {
 }
 
 export function StaggerItem({ children, className = '' }: StaggerItemProps) {
-  const itemVariants: Variants = {
-    hidden: { 
-      opacity: 0, 
-      y: 20 
-    },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: {
-        duration: 0.5,
-        ease: [0.16, 1, 0.3, 1],
-      },
-    },
+  const prefersReducedMotion = useReducedMotion()
+  const [mounted, setMounted] = useState(false)
+  const itemVariants: Variants = prefersReducedMotion
+    ? { hidden: { opacity: 1 }, visible: { opacity: 1 } }
+    : {
+        hidden: { 
+          opacity: 0.9, 
+          y: 12,
+        },
+        visible: {
+          opacity: 1,
+          y: 0,
+          transition: {
+            duration: 0.4,
+            ease: [0.16, 1, 0.3, 1],
+          },
+        },
+      }
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  if (!mounted) {
+    return <div className={className}>{children}</div>
   }
 
   return (

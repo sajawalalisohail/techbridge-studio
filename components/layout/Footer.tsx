@@ -20,7 +20,8 @@ export default function Footer() {
   const currentYear = new Date().getFullYear()
 
   return (
-    <footer className="border-t border-border bg-muted/50">
+    <footer className="border-t border-border bg-muted">
+      <div aria-hidden className="h-10 bg-gradient-to-b from-transparent to-muted" />
       <Container>
         <div className="py-16 md:py-20">
           {/* Main Footer Content */}

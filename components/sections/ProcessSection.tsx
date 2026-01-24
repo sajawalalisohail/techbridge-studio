@@ -79,39 +79,37 @@ export default function ProcessSection() {
 
           {/* Steps */}
           <div className="space-y-16 md:space-y-24">
-            {processSteps.map((step, index) => (
-              <Reveal key={step.id} delay={index * 0.1}>
-                <div className="relative pl-8 md:pl-20">
-                  {/* Step Number */}
-                  <div className="absolute left-0 md:left-8 -translate-x-1/2 w-4 h-4 rounded-full bg-background border-2 border-foreground" />
-                  
-                  <div className="grid md:grid-cols-12 gap-6">
-                    <div className="md:col-span-2">
-                      <span className="text-sm font-medium text-muted-foreground">
-                        {step.id}
-                      </span>
-                    </div>
-                    <div className="md:col-span-10">
-                      <h3 className="text-title font-semibold mb-3">
-                        {step.title}
-                      </h3>
-                      <p className="text-muted-foreground mb-4 max-w-xl">
-                        {step.description}
-                      </p>
-                      <ul className="flex flex-wrap gap-3">
-                        {step.details.map((detail) => (
-                          <li 
-                            key={detail}
-                            className="text-xs font-medium text-muted-foreground bg-background px-3 py-1.5 rounded-full border border-border"
-                          >
-                            {detail}
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
+            {processSteps.map((step) => (
+              <div key={step.id} className="relative pl-8 md:pl-20">
+                {/* Step Number */}
+                <div className="absolute left-0 md:left-8 -translate-x-1/2 w-4 h-4 rounded-full bg-background border-2 border-foreground" />
+                
+                <div className="grid md:grid-cols-12 gap-6">
+                  <div className="md:col-span-2">
+                    <span className="text-sm font-medium text-muted-foreground">
+                      {step.id}
+                    </span>
+                  </div>
+                  <div className="md:col-span-10">
+                    <h3 className="text-title font-semibold mb-3">
+                      {step.title}
+                    </h3>
+                    <p className="text-muted-foreground mb-4 max-w-xl">
+                      {step.description}
+                    </p>
+                    <ul className="flex flex-wrap gap-3">
+                      {step.details.map((detail) => (
+                        <li 
+                          key={detail}
+                          className="text-xs font-medium text-muted-foreground bg-background px-3 py-1.5 rounded-full border border-border"
+                        >
+                          {detail}
+                        </li>
+                      ))}
+                    </ul>
                   </div>
                 </div>
-              </Reveal>
+              </div>
             ))}
           </div>
         </div>

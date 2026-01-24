@@ -52,15 +52,13 @@ export default function FAQ() {
           </Reveal>
         </div>
 
-        <Reveal delay={0.2}>
-          <Accordion 
-            items={faqItems.map(item => ({
-              id: item.id,
-              title: item.title,
-              content: <p>{item.content}</p>,
-            }))}
-          />
-        </Reveal>
+        <Accordion 
+          items={faqItems.map(item => ({
+            id: item.id,
+            title: item.title,
+            content: <p>{item.content}</p>,
+          }))}
+        />
       </Container>
     </Section>
   )

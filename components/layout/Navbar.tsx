@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
 import Container from '@/components/ui/Container'
@@ -13,16 +13,27 @@ const navItems = [
 ]
 
 export default function Navbar() {
-  const [isScrolled, setIsScrolled] = useState(false)
+  const [isHeroVisible, setIsHeroVisible] = useState(true)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const observerRef = useRef<IntersectionObserver | null>(null)
 
   useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 20)
-    }
+    const hero = document.getElementById('hero')
+    if (!hero || typeof IntersectionObserver === 'undefined') return
 
-    window.addEventListener('scroll', handleScroll, { passive: true })
-    return () => window.removeEventListener('scroll', handleScroll)
+    observerRef.current?.disconnect()
+    observerRef.current = new IntersectionObserver(
+      ([entry]) => {
+        setIsHeroVisible(entry.isIntersecting)
+      },
+      {
+        root: null,
+        threshold: 0.25,
+      }
+    )
+
+    observerRef.current.observe(hero)
+    return () => observerRef.current?.disconnect()
   }, [])
 
   // Prevent body scroll when mobile menu is open
@@ -40,72 +51,140 @@ export default function Navbar() {
   return (
     <>
       <header
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-          isScrolled 
-            ? 'bg-background/80 backdrop-blur-lg border-b border-border' 
-            : 'bg-transparent'
-        }`}
+        className="fixed top-0 left-0 right-0 z-50"
       >
-        <Container>
-          <nav className="flex items-center justify-between h-20">
-            {/* Logo */}
-            <Link 
-              href="/" 
-              className="text-xl font-semibold tracking-tight hover:opacity-70 transition-opacity"
-            >
-              TechBridge
-            </Link>
+        <div className="h-20" aria-hidden="true" />
 
-            {/* Desktop Navigation */}
-            <div className="hidden md:flex items-center gap-8">
-              {navItems.map((item) => (
+        {/* State A: Full navbar (hero in view) */}
+        <div
+          className={`absolute inset-x-0 top-0 transition-all duration-300 ${
+            isHeroVisible ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-2 pointer-events-none'
+          }`}
+        >
+          <Container>
+            <nav className="flex items-center justify-between h-20">
+              {/* Logo */}
+              <Link 
+                href="/" 
+                className="text-xl font-semibold tracking-tight hover:opacity-70 transition-opacity"
+              >
+                TechBridge
+              </Link>
+
+              {/* Desktop Navigation */}
+              <div className="hidden md:flex items-center gap-8">
+                {navItems.map((item) => (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+                  >
+                    {item.label}
+                  </Link>
+                ))}
+              </div>
+
+              {/* Desktop CTA */}
+              <div className="hidden md:block">
+                <Button href="/quote" size="sm">
+                  Get a Quote
+                </Button>
+              </div>
+
+              {/* Mobile Menu Button */}
+              <button
+                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                className="md:hidden relative w-10 h-10 flex items-center justify-center"
+                aria-label="Toggle menu"
+                aria-expanded={isMobileMenuOpen}
+              >
+                <div className="flex flex-col gap-1.5">
+                  <motion.span
+                    animate={{
+                      rotate: isMobileMenuOpen ? 45 : 0,
+                      y: isMobileMenuOpen ? 6 : 0,
+                    }}
+                    className="block w-6 h-0.5 bg-foreground origin-center"
+                  />
+                  <motion.span
+                    animate={{ opacity: isMobileMenuOpen ? 0 : 1 }}
+                    className="block w-6 h-0.5 bg-foreground"
+                  />
+                  <motion.span
+                    animate={{
+                      rotate: isMobileMenuOpen ? -45 : 0,
+                      y: isMobileMenuOpen ? -6 : 0,
+                    }}
+                    className="block w-6 h-0.5 bg-foreground origin-center"
+                  />
+                </div>
+              </button>
+            </nav>
+          </Container>
+        </div>
+
+        {/* State B: Compact boxed/pill navbar */}
+        <div
+          className={`absolute inset-x-0 top-3 transition-all duration-300 ${
+            isHeroVisible ? 'opacity-0 -translate-y-2 pointer-events-none' : 'opacity-100 translate-y-0'
+          }`}
+        >
+          <Container>
+            <nav className="mx-auto w-fit flex h-14 items-center justify-center rounded-full border border-border bg-background/80 px-5 md:px-7 backdrop-blur-sm shadow-sm">
+              <div className="hidden md:flex items-center gap-6">
                 <Link
-                  key={item.href}
-                  href={item.href}
+                  href="/"
                   className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
                 >
-                  {item.label}
+                  Home
                 </Link>
-              ))}
-            </div>
-
-            {/* Desktop CTA */}
-            <div className="hidden md:block">
-              <Button href="/quote" size="sm">
-                Get a Quote
-              </Button>
-            </div>
-
-            {/* Mobile Menu Button */}
-            <button
-              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="md:hidden relative w-10 h-10 flex items-center justify-center"
-              aria-label="Toggle menu"
-              aria-expanded={isMobileMenuOpen}
-            >
-              <div className="flex flex-col gap-1.5">
-                <motion.span
-                  animate={{
-                    rotate: isMobileMenuOpen ? 45 : 0,
-                    y: isMobileMenuOpen ? 6 : 0,
-                  }}
-                  className="block w-6 h-0.5 bg-foreground origin-center"
-                />
-                <motion.span
-                  animate={{ opacity: isMobileMenuOpen ? 0 : 1 }}
-                  className="block w-6 h-0.5 bg-foreground"
-                />
-                <motion.span
-                  animate={{
-                    rotate: isMobileMenuOpen ? -45 : 0,
-                    y: isMobileMenuOpen ? -6 : 0,
-                  }}
-                  className="block w-6 h-0.5 bg-foreground origin-center"
-                />
+                {navItems.map((item) => (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+                  >
+                    {item.label}
+                  </Link>
+                ))}
+                <Link
+                  href="/quote"
+                  className="text-sm font-medium text-foreground hover:opacity-80 transition-opacity"
+                >
+                  Get a Quote
+                </Link>
               </div>
-            </button>
-          </nav>
-        </Container>
+
+              <button
+                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                className="md:hidden relative w-9 h-9 flex items-center justify-center"
+                aria-label="Toggle menu"
+                aria-expanded={isMobileMenuOpen}
+              >
+                <div className="flex flex-col gap-1.5">
+                  <motion.span
+                    animate={{
+                      rotate: isMobileMenuOpen ? 45 : 0,
+                      y: isMobileMenuOpen ? 6 : 0,
+                    }}
+                    className="block w-5 h-0.5 bg-foreground origin-center"
+                  />
+                  <motion.span
+                    animate={{ opacity: isMobileMenuOpen ? 0 : 1 }}
+                    className="block w-5 h-0.5 bg-foreground"
+                  />
+                  <motion.span
+                    animate={{
+                      rotate: isMobileMenuOpen ? -45 : 0,
+                      y: isMobileMenuOpen ? -6 : 0,
+                    }}
+                    className="block w-5 h-0.5 bg-foreground origin-center"
+                  />
+                </div>
+              </button>
+            </nav>
+          </Container>
+        </div>
       </header>
 
       {/* Mobile Menu */}
