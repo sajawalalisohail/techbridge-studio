@@ -337,7 +337,7 @@ export default function QuoteForm() {
             onChange={handleChange}
             rows={5}
             className="w-full px-4 py-3 bg-muted border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-foreground transition-colors resize-none"
-            placeholder="Describe what you're looking to build, any specific requirements, or questions you have..."
+            placeholder="Describe what you&apos;re looking to build, any specific requirements, or questions you have..."
           />
         </div>
       </div>

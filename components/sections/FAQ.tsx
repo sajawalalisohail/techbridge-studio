@@ -1,8 +1,4 @@
-'use client'
-
-import { useRef, useEffect } from 'react'
-import { gsap, ScrollTrigger, prefersReducedMotion } from '@/lib/gsap'
-import { Container, Section, Accordion } from '@/components/ui'
+import { Container, Section, Accordion, Reveal, StaggerContainer, StaggerItem } from '@/components/ui'
 
 const faqItems = [
   {
@@ -38,70 +34,31 @@ const faqItems = [
 ]
 
 export default function FAQ() {
-  const sectionRef = useRef<HTMLElement>(null)
-  const headerRef = useRef<HTMLDivElement>(null)
-  const accordionRef = useRef<HTMLDivElement>(null)
-
-  useEffect(() => {
-    if (prefersReducedMotion()) return
-
-    const ctx = gsap.context(() => {
-      // Header animation
-      if (headerRef.current) {
-        gsap.from(headerRef.current.children, {
-          opacity: 0,
-          y: 30,
-          duration: 0.6,
-          stagger: 0.1,
-          ease: 'power3.out',
-          scrollTrigger: {
-            trigger: headerRef.current,
-            start: 'top 85%',
-            once: true,
-          },
-        })
-      }
-
-      // Accordion animation
-      if (accordionRef.current) {
-        gsap.from(accordionRef.current, {
-          opacity: 0,
-          y: 20,
-          duration: 0.6,
-          ease: 'power3.out',
-          scrollTrigger: {
-            trigger: accordionRef.current,
-            start: 'top 85%',
-            once: true,
-          },
-        })
-      }
-    }, sectionRef)
-
-    return () => ctx.revert()
-  }, [])
-
   return (
-    <Section ref={sectionRef} id="faq">
+    <Section id="faq">
       <Container size="sm">
-        <div ref={headerRef} className="mb-10">
-          <p className="text-sm font-medium text-accent uppercase tracking-wider mb-4">
-            FAQ
-          </p>
-          <h2 className="text-headline-sm md:text-headline font-semibold tracking-tight">
-            Common questions.
-          </h2>
-        </div>
+        <StaggerContainer className="mb-12">
+          <StaggerItem>
+            <p className="text-sm font-medium text-muted-foreground uppercase tracking-wider mb-4">
+              FAQ
+            </p>
+          </StaggerItem>
+          <StaggerItem>
+            <h2 className="text-headline-sm md:text-headline font-semibold tracking-tight">
+              Common questions.
+            </h2>
+          </StaggerItem>
+        </StaggerContainer>
 
-        <div ref={accordionRef}>
+        <Reveal>
           <Accordion 
             items={faqItems.map(item => ({
               id: item.id,
               title: item.title,
-              content: <p className="text-sm leading-relaxed">{item.content}</p>,
+              content: <p>{item.content}</p>,
             }))}
           />
-        </div>
+        </Reveal>
       </Container>
     </Section>
   )

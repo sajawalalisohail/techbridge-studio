@@ -2,23 +2,61 @@
 @tailwind components;
 @tailwind utilities;
 
-/* ============================================
-   CSS VARIABLES - DARK THEME
-   ============================================ */
 :root {
-  --background: #050505;
-  --foreground: #fafafa;
-  --muted: #0a0a0a;
-  --muted-foreground: #a3a3a3;
-  --border: #1a1a1a;
-  --accent: #6366f1;
-  --accent-secondary: #8b5cf6;
-  --accent-foreground: #fafafa;
+  --background: #020617;
+  --foreground: #f8fafc;
+  --muted: #0f172a;
+  --muted-foreground: #a7b0c0;
+  --border: #1e293b;
+  --accent: #3b82f6;
+  --accent-foreground: #f8fafc;
+  --surface: #0f172a;
+  --surface-elevated: #111c33;
+  --accent-rgb: 59 130 246;
+  --accent-glow-rgb: 52 211 153;
+  --foreground-rgb: 248 250 252;
+  --background-rgb: 2 6 23;
+  --danger: #f87171;
+  --danger-foreground: #0f172a;
+  --footer-h: 520px;
+
+  /* Dark background system (intensity controls) */
+  --bg-gradient-opacity: 0.18;
+  --bg-glow-opacity: 0.14;
+  --bg-noise-opacity: 0.05;
 }
 
-/* ============================================
-   LENIS SMOOTH SCROLL
-   ============================================ */
+@media (min-width: 768px) {
+  :root {
+    --footer-h: 420px;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #020617;
+    --foreground: #f8fafc;
+    --muted: #0f172a;
+    --muted-foreground: #a7b0c0;
+    --border: #1e293b;
+    --accent: #3b82f6;
+    --accent-foreground: #f8fafc;
+    --surface: #0f172a;
+    --surface-elevated: #111c33;
+    --accent-rgb: 59 130 246;
+    --accent-glow-rgb: 52 211 153;
+    --foreground-rgb: 248 250 252;
+    --background-rgb: 2 6 23;
+    --danger: #f87171;
+    --danger-foreground: #0f172a;
+
+    --bg-gradient-opacity: 0.18;
+    --bg-glow-opacity: 0.14;
+    --bg-noise-opacity: 0.05;
+  }
+}
+
+/* Lenis Smooth Scroll */
 html.lenis,
 html.lenis body {
   height: auto;
@@ -36,28 +74,24 @@ html.lenis body {
   overflow: hidden;
 }
 
-/* ============================================
-   BASE STYLES
-   ============================================ */
+.lenis.lenis-smooth iframe {
+  pointer-events: none;
+}
+
+/* Base Styles */
 * {
   box-sizing: border-box;
   padding: 0;
   margin: 0;
 }
 
-/* Remove conflicting scroll-behavior */
 html {
-  scroll-behavior: auto;
+  scroll-behavior: smooth;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-    scroll-behavior: auto !important;
+  html {
+    scroll-behavior: auto;
   }
 }
 
@@ -67,7 +101,93 @@ body {
   font-family: var(--font-sans), system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  overflow-x: hidden;
+}
+
+/* Premium dark background system */
+body {
+  position: relative;
+}
+
+body::before,
+body::after {
+  content: '';
+  position: fixed;
+  inset: -20vmax;
+  z-index: -1;
+  pointer-events: none;
+}
+
+/* Subtle animated gradient movement */
+body::before {
+  background:
+    radial-gradient(60vmax 45vmax at 12% 8%, rgb(var(--accent-rgb) / var(--bg-gradient-opacity)) 0%, transparent 60%),
+    radial-gradient(50vmax 40vmax at 85% 15%, rgb(var(--accent-rgb) / calc(var(--bg-gradient-opacity) * 0.45)) 0%, transparent 70%),
+    radial-gradient(50vmax 40vmax at 85% 85%, rgb(var(--accent-glow-rgb) / var(--bg-glow-opacity)) 0%, transparent 70%);
+  opacity: 1;
+  filter: blur(42px);
+  animation: bg-drift 140s linear infinite;
+}
+
+/* Optional soft glow + grain overlay */
+body::after {
+  background:
+    radial-gradient(40vmax 30vmax at 20% 65%, rgb(var(--accent-rgb) / var(--bg-glow-opacity)) 0%, transparent 65%),
+    radial-gradient(35vmax 30vmax at 80% 70%, rgb(var(--accent-glow-rgb) / calc(var(--bg-glow-opacity) * 0.85)) 0%, transparent 70%),
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160' viewBox='0 0 160 160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2' stitchTiles='stitch'/></filter><rect width='160' height='160' filter='url(%23n)' opacity='1'/></svg>");
+  mix-blend-mode: soft-light;
+  opacity: var(--bg-noise-opacity);
+  filter: blur(0.35px);
+}
+
+/* Intro overlay background layers (match body background system) */
+.intro-bg {
+  background:
+    radial-gradient(60vmax 45vmax at 12% 8%, rgb(var(--accent-rgb) / var(--bg-gradient-opacity)) 0%, transparent 60%),
+    radial-gradient(50vmax 40vmax at 85% 15%, rgb(var(--accent-rgb) / calc(var(--bg-gradient-opacity) * 0.45)) 0%, transparent 70%),
+    radial-gradient(50vmax 40vmax at 85% 85%, rgb(var(--accent-glow-rgb) / var(--bg-glow-opacity)) 0%, transparent 70%);
+  opacity: 1;
+  filter: blur(42px);
+  animation: bg-drift 140s linear infinite;
+}
+
+.intro-grain {
+  background:
+    radial-gradient(40vmax 30vmax at 20% 65%, rgb(var(--accent-rgb) / var(--bg-glow-opacity)) 0%, transparent 65%),
+    radial-gradient(35vmax 30vmax at 80% 70%, rgb(var(--accent-glow-rgb) / calc(var(--bg-glow-opacity) * 0.85)) 0%, transparent 70%),
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160' viewBox='0 0 160 160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2' stitchTiles='stitch'/></filter><rect width='160' height='160' filter='url(%23n)' opacity='1'/></svg>");
+  mix-blend-mode: soft-light;
+  opacity: var(--bg-noise-opacity);
+  filter: blur(0.35px);
+}
+
+.intro-wipe {
+  background: linear-gradient(90deg, transparent 0%, rgb(var(--accent-glow-rgb) / 0.7) 50%, transparent 100%);
+  opacity: 0;
+  filter: blur(18px);
+}
+
+@keyframes bg-drift {
+  0% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  50% {
+    transform: translate3d(-2%, 2%, 0) scale(1.02);
+  }
+  100% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body::before {
+    animation: none;
+  }
+}
+
+@layer base {
+  p {
+    @apply leading-relaxed;
+  }
 }
 
 /* Selection */
@@ -88,7 +208,7 @@ a {
   text-decoration: none;
 }
 
-/* Images */
+/* Smooth Image Loading */
 img {
   max-width: 100%;
   height: auto;
@@ -96,178 +216,23 @@ img {
 
 /* Custom Scrollbar */
 ::-webkit-scrollbar {
-  width: 6px;
+  width: 8px;
 }
 
 ::-webkit-scrollbar-track {
-  background: var(--background);
+  background: var(--muted);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--border);
-  border-radius: 3px;
+  background: var(--muted-foreground);
+  border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--muted-foreground);
+  background: var(--foreground);
 }
 
-/* ============================================
-   INTRO OVERLAY
-   ============================================ */
-.intro-overlay {
-  position: fixed;
-  inset: 0;
-  z-index: 100;
-  background: #000;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.intro-content {
-  text-align: center;
-}
-
-.intro-text {
-  font-size: clamp(2.5rem, 10vw, 7rem);
-  font-weight: 600;
-  letter-spacing: -0.03em;
-  line-height: 1;
-  background: linear-gradient(
-    90deg,
-    #fff 0%,
-    #fff 35%,
-    var(--accent) 50%,
-    #fff 65%,
-    #fff 100%
-  );
-  background-size: 200% 100%;
-  background-position: 0% 0;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-.intro-subtext {
-  font-size: clamp(0.875rem, 2vw, 1.125rem);
-  font-weight: 400;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  color: var(--muted-foreground);
-  margin-top: 1rem;
-}
-
-/* ============================================
-   ANIMATED BACKGROUND
-   ============================================ */
-.animated-background {
-  position: fixed;
-  inset: 0;
-  z-index: -1;
-  overflow: hidden;
-  background: var(--background);
-}
-
-.gradient-orb {
-  position: absolute;
-  border-radius: 50%;
-  filter: blur(120px);
-  opacity: 0.1;
-  pointer-events: none;
-}
-
-.gradient-orb-1 {
-  width: 60vw;
-  height: 60vw;
-  max-width: 700px;
-  max-height: 700px;
-  background: radial-gradient(circle, var(--accent) 0%, transparent 70%);
-  top: -20%;
-  left: -10%;
-  animation: float1 30s ease-in-out infinite;
-}
-
-.gradient-orb-2 {
-  width: 50vw;
-  height: 50vw;
-  max-width: 600px;
-  max-height: 600px;
-  background: radial-gradient(circle, var(--accent-secondary) 0%, transparent 70%);
-  bottom: -15%;
-  right: -10%;
-  animation: float2 35s ease-in-out infinite;
-}
-
-.gradient-orb-3 {
-  width: 35vw;
-  height: 35vw;
-  max-width: 400px;
-  max-height: 400px;
-  background: radial-gradient(circle, #3b82f6 0%, transparent 70%);
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  animation: float3 25s ease-in-out infinite;
-  opacity: 0.06;
-}
-
-@keyframes float1 {
-  0%, 100% { transform: translate(0, 0); }
-  50% { transform: translate(30px, 20px); }
-}
-
-@keyframes float2 {
-  0%, 100% { transform: translate(0, 0); }
-  50% { transform: translate(-25px, -20px); }
-}
-
-@keyframes float3 {
-  0%, 100% { transform: translate(-50%, -50%); }
-  50% { transform: translate(-50%, -50%) translate(20px, -25px); }
-}
-
-/* Noise overlay */
-.noise-overlay {
-  position: absolute;
-  inset: 0;
-  opacity: 0.03;
-  pointer-events: none;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
-  background-repeat: repeat;
-  background-size: 256px 256px;
-}
-
-/* Vignette */
-.vignette-overlay {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  background: radial-gradient(
-    ellipse at center,
-    transparent 0%,
-    transparent 60%,
-    rgba(0, 0, 0, 0.3) 100%
-  );
-}
-
-/* ============================================
-   CARD STYLES
-   ============================================ */
-.service-card {
-  position: relative;
-  transition: transform 0.4s ease, box-shadow 0.4s ease, border-color 0.3s ease;
-}
-
-.service-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 16px 32px -16px rgba(99, 102, 241, 0.2);
-  border-color: var(--accent);
-}
-
-/* ============================================
-   UTILITY CLASSES
-   ============================================ */
+/* Utility Classes */
 @layer utilities {
   .text-balance {
     text-wrap: balance;
@@ -275,13 +240,6 @@ img {
   
   .text-gradient {
     background: linear-gradient(135deg, var(--foreground) 0%, var(--muted-foreground) 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-  }
-  
-  .text-gradient-accent {
-    background: linear-gradient(135deg, var(--accent) 0%, var(--accent-secondary) 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;

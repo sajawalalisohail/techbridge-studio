@@ -17,7 +17,7 @@ export function AccordionItem({
   onToggle 
 }: AccordionItemProps) {
   return (
-    <div className="border-b border-border">
+    <div>
       <button
         onClick={onToggle}
         className="flex w-full items-center justify-between py-6 text-left transition-colors hover:text-muted-foreground"

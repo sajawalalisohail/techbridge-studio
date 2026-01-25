@@ -1,8 +1,4 @@
-'use client'
-
-import { useRef, useEffect } from 'react'
-import { gsap, ScrollTrigger, prefersReducedMotion } from '@/lib/gsap'
-import { Container, Section, Card, CardTitle, CardDescription, Button } from '@/components/ui'
+import { Container, Section, Card, CardTitle, CardDescription, Button, StaggerContainer, StaggerItem } from '@/components/ui'
 
 const services = [
   {
@@ -44,102 +40,59 @@ const services = [
 ]
 
 export default function ServicesGrid() {
-  const sectionRef = useRef<HTMLElement>(null)
-  const headerRef = useRef<HTMLDivElement>(null)
-  const cardsRef = useRef<HTMLDivElement>(null)
-
-  useEffect(() => {
-    if (prefersReducedMotion()) return
-
-    const ctx = gsap.context(() => {
-      // Header animation
-      if (headerRef.current) {
-        gsap.from(headerRef.current.children, {
-          opacity: 0,
-          y: 30,
-          duration: 0.6,
-          stagger: 0.1,
-          ease: 'power3.out',
-          scrollTrigger: {
-            trigger: headerRef.current,
-            start: 'top 85%',
-            once: true,
-          },
-        })
-      }
-
-      // Cards animation - slide in from alternating sides
-      if (cardsRef.current) {
-        const cards = Array.from(cardsRef.current.children) as HTMLElement[]
-        cards.forEach((card, index) => {
-          const direction = index % 2 === 0 ? -50 : 50
-          gsap.from(card, {
-            opacity: 0,
-            x: direction,
-            duration: 0.7,
-            ease: 'power3.out',
-            scrollTrigger: {
-              trigger: card,
-              start: 'top 80%',
-              once: true,
-            },
-          })
-        })
-      }
-    }, sectionRef)
-
-    return () => ctx.revert()
-  }, [])
-
   return (
-    <Section ref={sectionRef} id="services">
+    <Section id="services">
       <Container>
-        <div ref={headerRef} className="mb-12 md:mb-16">
-          <p className="text-sm font-medium text-accent uppercase tracking-wider mb-4">
-            What We Build
-          </p>
-          <h2 className="text-headline-sm md:text-headline font-semibold tracking-tight">
-            Four ways to work together.
-          </h2>
-        </div>
+        <StaggerContainer className="mb-16">
+          <StaggerItem>
+            <p className="text-sm font-medium text-muted-foreground uppercase tracking-wider mb-4">
+              What We Build
+            </p>
+          </StaggerItem>
+          <StaggerItem>
+            <h2 className="text-headline-sm md:text-headline font-semibold tracking-tight">
+              Four ways to work together.
+            </h2>
+          </StaggerItem>
+        </StaggerContainer>
 
-        <div ref={cardsRef} className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <StaggerContainer className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {services.map((service) => (
-            <Card 
-              key={service.id} 
-              className="service-card h-full flex flex-col" 
-              padding="lg"
-            >
-              <div className="flex items-start justify-between mb-4">
-                <span className="text-2xl">{service.icon}</span>
-                <span className="text-xs font-medium text-muted-foreground bg-background px-3 py-1 rounded-full border border-border">
-                  Tier {service.tier}
-                </span>
-              </div>
-              <CardTitle className="mb-2 text-lg">{service.title}</CardTitle>
-              <CardDescription className="mb-5 flex-1 text-sm">
-                {service.description}
-              </CardDescription>
-              <ul className="space-y-1.5 mb-5">
-                {service.features.map((feature) => (
-                  <li key={feature} className="text-sm text-muted-foreground flex items-center gap-2">
-                    <span className="w-1 h-1 bg-accent rounded-full flex-shrink-0" />
-                    {feature}
-                  </li>
-                ))}
-              </ul>
-              <div className="pt-4 border-t border-border mt-auto">
-                <p className="font-semibold text-sm">{service.price}</p>
-              </div>
-            </Card>
+            <StaggerItem key={service.id}>
+              <Card className="h-full flex flex-col" padding="lg">
+                <div className="flex items-start justify-between mb-4">
+                  <span className="text-3xl">{service.icon}</span>
+                  <span className="text-xs font-medium text-muted-foreground bg-background px-3 py-1 rounded-full border border-border">
+                    Tier {service.tier}
+                  </span>
+                </div>
+                <CardTitle className="mb-3">{service.title}</CardTitle>
+                <CardDescription className="mb-6 flex-1">
+                  {service.description}
+                </CardDescription>
+                <ul className="space-y-2 mb-6">
+                  {service.features.map((feature) => (
+                    <li key={feature} className="text-sm text-muted-foreground flex items-center gap-2">
+                      <span className="w-1 h-1 bg-foreground rounded-full" />
+                      {feature}
+                    </li>
+                  ))}
+                </ul>
+                <div className="pt-4 border-t border-border mt-auto">
+                  <p className="font-semibold">{service.price}</p>
+                </div>
+              </Card>
+            </StaggerItem>
           ))}
-        </div>
+        </StaggerContainer>
 
-        <div className="mt-10 text-center">
-          <Button href="/services" variant="outline">
-            View All Services
-          </Button>
-        </div>
+        <StaggerContainer className="mt-12 text-center">
+          <StaggerItem>
+            <Button href="/services" variant="outline">
+              View All Services
+            </Button>
+          </StaggerItem>
+        </StaggerContainer>
       </Container>
     </Section>
   )

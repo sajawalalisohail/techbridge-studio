@@ -14,9 +14,9 @@ const Section = forwardRef<HTMLElement, SectionProps>(({
   id
 }, ref) => {
   const sizeClasses = {
-    default: 'py-section',
-    sm: 'py-section-sm',
-    xs: 'py-section-xs',
+    default: 'py-16 md:py-24 lg:py-28',
+    sm: 'py-12 md:py-20 lg:py-24',
+    xs: 'py-10 md:py-16',
   }
 
   return (

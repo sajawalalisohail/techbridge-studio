@@ -1,8 +1,4 @@
-'use client'
-
-import { useRef, useEffect } from 'react'
-import { gsap, ScrollTrigger, prefersReducedMotion } from '@/lib/gsap'
-import { Container } from '@/components/ui'
+import { Container, Section, Reveal, StaggerContainer, StaggerItem } from '@/components/ui'
 
 const techStack = [
   { name: 'Next.js', description: 'React Framework' },
@@ -11,51 +7,50 @@ const techStack = [
   { name: 'Automation', description: 'Workflows' },
 ]
 
+const values = [
+  { name: 'Speed', description: 'Ship in weeks, not months' },
+  { name: 'Clarity', description: 'No surprises, no scope creep' },
+  { name: 'Quality', description: 'Production-ready code' },
+  { name: 'Support', description: 'We stick around' },
+]
+
 export default function TrustStrip() {
-  const sectionRef = useRef<HTMLElement>(null)
-  const itemsRef = useRef<HTMLDivElement>(null)
-
-  useEffect(() => {
-    if (prefersReducedMotion() || !itemsRef.current) return
-
-    const ctx = gsap.context(() => {
-      gsap.from(itemsRef.current?.children || [], {
-        opacity: 0,
-        y: 20,
-        duration: 0.5,
-        stagger: 0.08,
-        ease: 'power3.out',
-        scrollTrigger: {
-          trigger: sectionRef.current,
-          start: 'top 90%',
-          once: true,
-        },
-      })
-    }, sectionRef)
-
-    return () => ctx.revert()
-  }, [])
-
   return (
-    <section ref={sectionRef} className="py-10 border-y border-border bg-muted/30">
+    <Section size="xs" className="border-y border-border bg-muted">
       <Container>
-        <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-          <p className="text-sm text-muted-foreground font-medium uppercase tracking-wider">
-            Built with modern tools
-          </p>
-          <div ref={itemsRef} className="flex flex-wrap items-center justify-center gap-8 md:gap-10">
+        <div className="flex flex-col md:flex-row items-center justify-between gap-8">
+          <Reveal>
+            <p className="text-sm text-muted-foreground font-medium uppercase tracking-wider">
+              Built with modern tools
+            </p>
+          </Reveal>
+          <StaggerContainer className="flex flex-wrap items-center justify-center gap-8 md:gap-12">
             {techStack.map((item) => (
-              <div 
-                key={item.name} 
-                className="text-center md:text-left"
-              >
-                <p className="font-medium text-sm">{item.name}</p>
+              <StaggerItem key={item.name} className="text-center md:text-left">
+                <p className="font-medium">{item.name}</p>
                 <p className="text-xs text-muted-foreground">{item.description}</p>
-              </div>
+              </StaggerItem>
             ))}
-          </div>
+          </StaggerContainer>
         </div>
       </Container>
-    </section>
+    </Section>
+  )
+}
+
+export function ValuesStrip() {
+  return (
+    <Section size="xs" className="border-y border-border bg-muted">
+      <Container>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+          {values.map((item) => (
+            <div key={item.name} className="text-center">
+              <p className="font-semibold text-lg mb-1">{item.name}</p>
+              <p className="text-sm text-muted-foreground">{item.description}</p>
+            </div>
+          ))}
+        </div>
+      </Container>
+    </Section>
   )
 }

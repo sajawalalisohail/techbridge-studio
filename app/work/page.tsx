@@ -182,7 +182,7 @@ export default function WorkPage() {
       </Section>
 
       {/* Note */}
-      <Section size="sm" className="bg-muted/30">
+      <Section size="sm" className="bg-muted">
         <Container size="sm">
           <div className="text-center">
             <Reveal>

@@ -170,7 +170,7 @@ export default function ServicesPage() {
       </Section>
 
       {/* Custom Projects */}
-      <Section className="bg-muted/30">
+      <Section className="bg-muted">
         <Container size="sm">
           <div className="text-center">
             <Reveal>

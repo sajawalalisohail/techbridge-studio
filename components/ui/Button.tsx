@@ -36,8 +36,8 @@ export default function Button({
   const variantStyles = {
     primary: 'bg-foreground text-background hover:opacity-90',
     secondary: 'bg-muted text-foreground hover:bg-border',
-    outline: 'border border-border bg-transparent hover:bg-muted',
-    ghost: 'bg-transparent hover:bg-muted',
+    outline: 'border border-foreground/30 bg-transparent hover:bg-foreground/5',
+    ghost: 'bg-transparent hover:bg-foreground/5',
   }
 
   const sizeStyles = {

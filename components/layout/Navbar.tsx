@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
 import Container from '@/components/ui/Container'
@@ -13,40 +13,28 @@ const navItems = [
 ]
 
 export default function Navbar() {
-  const [scrollState, setScrollState] = useState<'top' | 'scrolled'>('top')
+  const [isHeroVisible, setIsHeroVisible] = useState(true)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
-  const [isVisible, setIsVisible] = useState(true) // Start visible
-
-  // Handle scroll state
-  const handleScroll = useCallback(() => {
-    const scrollY = window.scrollY
-    const heroHeight = window.innerHeight * 0.7
-    
-    if (scrollY > heroHeight) {
-      setScrollState('scrolled')
-    } else {
-      setScrollState('top')
-    }
-  }, [])
+  const observerRef = useRef<IntersectionObserver | null>(null)
 
   useEffect(() => {
-    // Show navbar after a delay (for intro animation)
-    const introPlayed = sessionStorage.getItem('introPlayed')
-    const delay = introPlayed ? 100 : 3000
-    
-    const timer = setTimeout(() => {
-      setIsVisible(true)
-    }, delay)
+    const hero = document.getElementById('hero')
+    if (!hero || typeof IntersectionObserver === 'undefined') return
 
-    // Scroll listener
-    window.addEventListener('scroll', handleScroll, { passive: true })
-    handleScroll()
-    
-    return () => {
-      clearTimeout(timer)
-      window.removeEventListener('scroll', handleScroll)
-    }
-  }, [handleScroll])
+    observerRef.current?.disconnect()
+    observerRef.current = new IntersectionObserver(
+      ([entry]) => {
+        setIsHeroVisible(entry.isIntersecting)
+      },
+      {
+        root: null,
+        threshold: 0.25,
+      }
+    )
+
+    observerRef.current.observe(hero)
+    return () => observerRef.current?.disconnect()
+  }, [])
 
   // Prevent body scroll when mobile menu is open
   useEffect(() => {
@@ -60,76 +48,48 @@ export default function Navbar() {
     }
   }, [isMobileMenuOpen])
 
-  const isCompact = scrollState === 'scrolled'
-
   return (
     <>
       <header
-        className={`fixed z-50 transition-all duration-500 ${
-          isCompact 
-            ? 'top-4 left-4 right-4 md:left-1/2 md:right-auto md:-translate-x-1/2' 
-            : 'top-0 left-0 right-0'
-        }`}
+        className="fixed top-0 left-0 right-0 z-50"
       >
-        <div className={`transition-all duration-500 ${
-          isCompact 
-            ? 'bg-background/80 backdrop-blur-xl border border-border/50 rounded-full shadow-lg md:px-2' 
-            : 'bg-transparent'
-        }`}>
-          <Container className={isCompact ? 'px-4 md:px-6' : ''}>
-            <nav className={`flex items-center justify-between transition-all duration-500 ${
-              isCompact ? 'h-14' : 'h-20'
-            }`}>
-              {/* Logo - hidden in compact mode on desktop */}
+        <div className="h-20" aria-hidden="true" />
+
+        {/* State A: Full navbar (hero in view) */}
+        <div
+          className={`absolute inset-x-0 top-0 transition-all duration-300 ${
+            isHeroVisible ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-2 pointer-events-none'
+          }`}
+        >
+          <Container>
+            <nav className="flex items-center justify-between h-20">
+              {/* Logo */}
               <Link 
                 href="/" 
-                className={`font-semibold tracking-tight hover:text-accent transition-all duration-300 ${
-                  isCompact ? 'text-lg md:hidden' : 'text-xl'
-                }`}
+                className="text-xl font-semibold tracking-tight hover:opacity-70 transition-opacity"
               >
                 TechBridge
               </Link>
 
               {/* Desktop Navigation */}
-              <div className={`hidden md:flex items-center ${isCompact ? 'gap-1' : 'gap-8'}`}>
+              <div className="hidden md:flex items-center gap-8">
                 {navItems.map((item) => (
                   <Link
                     key={item.href}
                     href={item.href}
-                    className={`font-medium text-muted-foreground hover:text-foreground transition-colors duration-300 ${
-                      isCompact 
-                        ? 'text-sm px-4 py-2 rounded-full hover:bg-muted' 
-                        : 'text-sm relative group'
-                    }`}
+                    className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
                   >
                     {item.label}
-                    {!isCompact && (
-                      <span className="absolute -bottom-1 left-0 w-0 h-px bg-accent transition-all duration-300 group-hover:w-full" />
-                    )}
                   </Link>
                 ))}
-                
-                {/* CTA in compact nav */}
-                <Link
-                  href="/quote"
-                  className={`font-medium transition-all duration-300 ${
-                    isCompact 
-                      ? 'text-sm px-5 py-2 rounded-full bg-foreground text-background hover:bg-foreground/90 ml-2' 
-                      : 'hidden'
-                  }`}
-                >
-                  Get a Quote
-                </Link>
               </div>
 
-              {/* Desktop CTA - only when not compact */}
-              {!isCompact && (
-                <div className="hidden md:block">
-                  <Button href="/quote" size="sm">
-                    Get a Quote
-                  </Button>
-                </div>
-              )}
+              {/* Desktop CTA */}
+              <div className="hidden md:block">
+                <Button href="/quote" size="sm">
+                  Get a Quote
+                </Button>
+              </div>
 
               {/* Mobile Menu Button */}
               <button
@@ -139,20 +99,86 @@ export default function Navbar() {
                 aria-expanded={isMobileMenuOpen}
               >
                 <div className="flex flex-col gap-1.5">
-                  <span
-                    className={`block w-6 h-0.5 bg-foreground origin-center transition-transform duration-200 ${
-                      isMobileMenuOpen ? 'rotate-45 translate-y-2' : ''
-                    }`}
+                  <motion.span
+                    animate={{
+                      rotate: isMobileMenuOpen ? 45 : 0,
+                      y: isMobileMenuOpen ? 6 : 0,
+                    }}
+                    className="block w-6 h-0.5 bg-foreground origin-center"
                   />
-                  <span
-                    className={`block w-6 h-0.5 bg-foreground transition-opacity duration-200 ${
-                      isMobileMenuOpen ? 'opacity-0' : ''
-                    }`}
+                  <motion.span
+                    animate={{ opacity: isMobileMenuOpen ? 0 : 1 }}
+                    className="block w-6 h-0.5 bg-foreground"
                   />
-                  <span
-                    className={`block w-6 h-0.5 bg-foreground origin-center transition-transform duration-200 ${
-                      isMobileMenuOpen ? '-rotate-45 -translate-y-2' : ''
-                    }`}
+                  <motion.span
+                    animate={{
+                      rotate: isMobileMenuOpen ? -45 : 0,
+                      y: isMobileMenuOpen ? -6 : 0,
+                    }}
+                    className="block w-6 h-0.5 bg-foreground origin-center"
+                  />
+                </div>
+              </button>
+            </nav>
+          </Container>
+        </div>
+
+        {/* State B: Compact boxed/pill navbar */}
+        <div
+          className={`absolute inset-x-0 top-3 transition-all duration-300 ${
+            isHeroVisible ? 'opacity-0 -translate-y-2 pointer-events-none' : 'opacity-100 translate-y-0'
+          }`}
+        >
+          <Container>
+            <nav className="mx-auto w-fit flex h-14 items-center justify-center rounded-full border border-border bg-background/80 px-5 md:px-7 backdrop-blur-sm shadow-sm">
+              <div className="hidden md:flex items-center gap-6">
+                <Link
+                  href="/"
+                  className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  Home
+                </Link>
+                {navItems.map((item) => (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+                  >
+                    {item.label}
+                  </Link>
+                ))}
+                <Link
+                  href="/quote"
+                  className="text-sm font-medium text-foreground hover:opacity-80 transition-opacity"
+                >
+                  Get a Quote
+                </Link>
+              </div>
+
+              <button
+                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                className="md:hidden relative w-9 h-9 flex items-center justify-center"
+                aria-label="Toggle menu"
+                aria-expanded={isMobileMenuOpen}
+              >
+                <div className="flex flex-col gap-1.5">
+                  <motion.span
+                    animate={{
+                      rotate: isMobileMenuOpen ? 45 : 0,
+                      y: isMobileMenuOpen ? 6 : 0,
+                    }}
+                    className="block w-5 h-0.5 bg-foreground origin-center"
+                  />
+                  <motion.span
+                    animate={{ opacity: isMobileMenuOpen ? 0 : 1 }}
+                    className="block w-5 h-0.5 bg-foreground"
+                  />
+                  <motion.span
+                    animate={{
+                      rotate: isMobileMenuOpen ? -45 : 0,
+                      y: isMobileMenuOpen ? -6 : 0,
+                    }}
+                    className="block w-5 h-0.5 bg-foreground origin-center"
                   />
                 </div>
               </button>
@@ -178,12 +204,12 @@ export default function Navbar() {
                     key={item.href}
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: index * 0.08, duration: 0.3 }}
+                    transition={{ delay: index * 0.1 }}
                   >
                     <Link
                       href={item.href}
                       onClick={() => setIsMobileMenuOpen(false)}
-                      className="block py-4 text-3xl font-medium hover:text-accent transition-colors duration-300"
+                      className="block py-4 text-3xl font-medium hover:text-muted-foreground transition-colors"
                     >
                       {item.label}
                     </Link>
@@ -193,12 +219,12 @@ export default function Navbar() {
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.25, duration: 0.3 }}
+                transition={{ delay: 0.3 }}
               >
                 <Link 
                   href="/quote" 
                   onClick={() => setIsMobileMenuOpen(false)}
-                  className="inline-flex items-center justify-center font-medium rounded-full bg-foreground text-background hover:opacity-90 h-14 px-10 text-base w-full transition-opacity duration-300"
+                  className="inline-flex items-center justify-center font-medium transition-all duration-300 ease-smooth rounded-full bg-foreground text-background hover:opacity-90 h-14 px-10 text-base w-full"
                 >
                   Get a Quote
                 </Link>

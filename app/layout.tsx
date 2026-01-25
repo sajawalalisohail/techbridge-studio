@@ -4,13 +4,15 @@ import './globals.css'
 import LenisProvider from '@/providers/LenisProvider'
 import Navbar from '@/components/layout/Navbar'
 import Footer from '@/components/layout/Footer'
-import { AnimatedBackground } from '@/components/background'
-import ClientIntro from './ClientIntro'
+import IntroOverlayShell from '@/components/IntroOverlayShell'
+import IntroOverlayClient from '@/components/IntroOverlayClient'
 
 const spaceGrotesk = Space_Grotesk({
   subsets: ['latin'],
   variable: '--font-sans',
   display: 'swap',
+  adjustFontFallback: true,
+  fallback: ['system-ui', 'Segoe UI', 'Arial'],
   weight: ['300', '400', '500', '600', '700'],
 })
 
@@ -42,19 +44,18 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en" className={spaceGrotesk.variable}>
+    <html lang="en" className={spaceGrotesk.variable} suppressHydrationWarning >
       <body className="min-h-screen bg-background text-foreground antialiased">
+        <IntroOverlayShell />
+        <IntroOverlayClient />
         <LenisProvider>
-          {/* Animated background layer */}
-          <AnimatedBackground />
-          
-          {/* Intro overlay (client component) */}
-          <ClientIntro />
-          
-          {/* Main content */}
           <Navbar />
-          <main>{children}</main>
-          <Footer />
+          <div className="relative z-10 bg-background">
+            <main>{children}</main>
+          </div>
+          <div className="sticky bottom-0 z-0 h-[var(--footer-h)]">
+            <Footer />
+          </div>
         </LenisProvider>
       </body>
     </html>

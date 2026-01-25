@@ -150,7 +150,7 @@ export default function ProcessPage() {
       </Section>
 
       {/* Principles */}
-      <Section size="xs" className="border-y border-border bg-muted/30">
+      <Section size="xs" className="border-y border-border bg-muted">
         <Container>
           <StaggerContainer className="grid grid-cols-2 md:grid-cols-4 gap-8">
             {principles.map((principle) => (

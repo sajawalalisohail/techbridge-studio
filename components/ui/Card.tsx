@@ -24,9 +24,9 @@ export default function Card({
   return (
     <div 
       className={`
-        bg-muted border border-border rounded-card
+        bg-muted border border-border/80 rounded-card
         ${paddingStyles[padding]}
-        ${hover ? 'transition-all duration-300 ease-smooth hover:border-muted-foreground hover:shadow-lg' : ''}
+        ${hover ? 'transition-all duration-300 ease-smooth hover:border-foreground/15 hover:shadow-md' : ''}
         ${onClick ? 'cursor-pointer' : ''}
         ${className}
       `}
