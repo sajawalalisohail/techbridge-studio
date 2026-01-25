@@ -1,7 +1,7 @@
 'use client'
 
-import { useRef } from 'react'
-import { motion, useScroll, useTransform } from 'framer-motion'
+import { useEffect, useRef, useState } from 'react'
+import { motion, useScroll } from 'framer-motion'
 import { Container, Section, StaggerContainer, StaggerItem } from '@/components/ui'
 
 const processSteps = [
@@ -39,10 +39,37 @@ const processSteps = [
 
 export default function ProcessSection() {
   const containerRef = useRef<HTMLDivElement>(null)
+  const [activeIndex, setActiveIndex] = useState(0)
+  const stepRefs = useRef<Array<HTMLDivElement | null>>([])
   const { scrollYProgress } = useScroll({
     target: containerRef,
     offset: ['start end', 'end start'],
   })
+
+  useEffect(() => {
+    const targets = stepRefs.current.filter(Boolean) as HTMLDivElement[]
+    if (!targets.length) return
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const visible = entries
+          .filter((entry) => entry.isIntersecting)
+          .sort((a, b) => b.intersectionRatio - a.intersectionRatio)
+
+        if (!visible.length) return
+        const index = targets.indexOf(visible[0].target as HTMLDivElement)
+        if (index >= 0) setActiveIndex(index)
+      },
+      {
+        root: null,
+        rootMargin: '-35% 0px -35% 0px',
+        threshold: [0.1, 0.3, 0.6],
+      }
+    )
+
+    targets.forEach((el) => observer.observe(el))
+    return () => observer.disconnect()
+  }, [])
 
   return (
     <Section id="process" className="bg-muted">
@@ -79,30 +106,50 @@ export default function ProcessSection() {
 
           {/* Steps */}
           <StaggerContainer className="space-y-16 md:space-y-24">
-            {processSteps.map((step) => (
-              <StaggerItem key={step.id}>
-                <div className="relative pl-8 md:pl-20">
+            {processSteps.map((step, index) => {
+              const isActive = index === activeIndex
+              return (
+              <StaggerItem 
+                key={step.id}
+                className={`transition-all duration-300 ${isActive ? 'scale-[1.01] opacity-100' : 'opacity-60'}`}
+              >
+                <div
+                  ref={(el) => {
+                    stepRefs.current[index] = el
+                  }}
+                  className="relative pl-8 md:pl-20"
+                >
                   {/* Step Number */}
-                  <div className="absolute left-0 md:left-8 -translate-x-1/2 w-4 h-4 rounded-full bg-background border-2 border-foreground" />
+                  <div
+                    className={`absolute left-0 md:left-8 -translate-x-1/2 w-4 h-4 rounded-full border-2 transition-all duration-300 ${
+                      isActive
+                        ? 'bg-foreground border-foreground shadow-[0_0_0_6px_rgba(10,10,10,0.08)]'
+                        : 'bg-background border-foreground'
+                    }`}
+                  />
                   
                   <div className="grid md:grid-cols-12 gap-6">
                     <div className="md:col-span-2">
-                      <span className="text-sm font-medium text-muted-foreground">
+                      <span className={`text-sm font-medium transition-colors duration-300 ${isActive ? 'text-foreground' : 'text-muted-foreground'}`}>
                         {step.id}
                       </span>
                     </div>
                     <div className="md:col-span-10">
-                      <h3 className="text-title font-semibold mb-3">
+                      <h3 className={`text-title font-semibold mb-3 transition-colors duration-300 ${isActive ? 'text-foreground' : 'text-foreground/70'}`}>
                         {step.title}
                       </h3>
-                      <p className="text-muted-foreground mb-4 max-w-xl">
+                      <p className={`mb-4 max-w-xl transition-colors duration-300 ${isActive ? 'text-foreground/80' : 'text-muted-foreground'}`}>
                         {step.description}
                       </p>
                       <ul className="flex flex-wrap gap-3">
                         {step.details.map((detail) => (
                           <li 
                             key={detail}
-                            className="text-xs font-medium text-muted-foreground bg-background px-3 py-1.5 rounded-full border border-border"
+                            className={`text-xs font-medium px-3 py-1.5 rounded-full border transition-colors duration-300 ${
+                              isActive
+                                ? 'text-foreground/80 border-foreground/20 bg-background'
+                                : 'text-muted-foreground bg-background border-border'
+                            }`}
                           >
                             {detail}
                           </li>
@@ -112,7 +159,7 @@ export default function ProcessSection() {
                   </div>
                 </div>
               </StaggerItem>
-            ))}
+            )})}
           </StaggerContainer>
         </div>
       </Container>

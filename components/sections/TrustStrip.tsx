@@ -1,4 +1,4 @@
-import { Container, Section, Reveal } from '@/components/ui'
+import { Container, Section, Reveal, StaggerContainer, StaggerItem } from '@/components/ui'
 
 const techStack = [
   { name: 'Next.js', description: 'React Framework' },
@@ -24,14 +24,14 @@ export default function TrustStrip() {
               Built with modern tools
             </p>
           </Reveal>
-          <div className="flex flex-wrap items-center justify-center gap-8 md:gap-12">
+          <StaggerContainer className="flex flex-wrap items-center justify-center gap-8 md:gap-12">
             {techStack.map((item) => (
-              <div key={item.name} className="text-center md:text-left">
+              <StaggerItem key={item.name} className="text-center md:text-left">
                 <p className="font-medium">{item.name}</p>
                 <p className="text-xs text-muted-foreground">{item.description}</p>
-              </div>
+              </StaggerItem>
             ))}
-          </div>
+          </StaggerContainer>
         </div>
       </Container>
     </Section>

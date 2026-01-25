@@ -21,11 +21,11 @@ export default function FinalCTA() {
             </p>
           </Reveal>
           <Reveal delay={0.2} once>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <div className="relative z-10 flex flex-col sm:flex-row gap-4 justify-center">
               <Button 
                 href="/quote" 
                 size="lg"
-                className="bg-background text-foreground hover:bg-background/90"
+                className="bg-emerald-300 text-black ring-1 ring-emerald-200/70 shadow-[0_16px_30px_-18px_rgba(16,185,129,0.65)] hover:bg-emerald-200"
               >
                 Request a Quote
               </Button>
