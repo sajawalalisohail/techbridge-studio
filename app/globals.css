@@ -116,6 +116,27 @@ body::after {
   filter: blur(0.3px);
 }
 
+/* Intro overlay background layers (match body background system) */
+.intro-bg {
+  background:
+    radial-gradient(60vmax 40vmax at 10% 10%, rgba(255, 255, 255, var(--bg-gradient-opacity)) 0%, rgba(255, 255, 255, 0) 60%),
+    radial-gradient(50vmax 40vmax at 90% 20%, rgba(120, 160, 255, var(--bg-gradient-opacity)) 0%, rgba(120, 160, 255, 0) 65%),
+    radial-gradient(45vmax 35vmax at 30% 85%, rgba(110, 255, 220, var(--bg-gradient-opacity)) 0%, rgba(110, 255, 220, 0) 70%);
+  opacity: 1;
+  filter: blur(40px);
+  animation: bg-drift 120s linear infinite;
+}
+
+.intro-grain {
+  background:
+    radial-gradient(35vmax 25vmax at 75% 60%, rgba(255, 255, 255, var(--bg-glow-opacity)) 0%, rgba(255, 255, 255, 0) 60%),
+    radial-gradient(30vmax 20vmax at 20% 75%, rgba(120, 160, 255, var(--bg-glow-opacity)) 0%, rgba(120, 160, 255, 0) 65%),
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160' viewBox='0 0 160 160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2' stitchTiles='stitch'/></filter><rect width='160' height='160' filter='url(%23n)' opacity='1'/></svg>");
+  mix-blend-mode: soft-light;
+  opacity: var(--bg-noise-opacity);
+  filter: blur(0.3px);
+}
+
 @keyframes bg-drift {
   0% {
     transform: translate3d(0, 0, 0) scale(1);

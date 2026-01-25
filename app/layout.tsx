@@ -4,11 +4,15 @@ import './globals.css'
 import LenisProvider from '@/providers/LenisProvider'
 import Navbar from '@/components/layout/Navbar'
 import Footer from '@/components/layout/Footer'
+import IntroOverlayShell from '@/components/IntroOverlayShell'
+import IntroOverlayClient from '@/components/IntroOverlayClient'
 
 const spaceGrotesk = Space_Grotesk({
   subsets: ['latin'],
   variable: '--font-sans',
   display: 'swap',
+  adjustFontFallback: true,
+  fallback: ['system-ui', 'Segoe UI', 'Arial'],
   weight: ['300', '400', '500', '600', '700'],
 })
 
@@ -42,6 +46,8 @@ export default function RootLayout({
   return (
     <html lang="en" className={spaceGrotesk.variable} suppressHydrationWarning >
       <body className="min-h-screen bg-background text-foreground antialiased">
+        <IntroOverlayShell />
+        <IntroOverlayClient />
         <LenisProvider>
           <Navbar />
           <main>{children}</main>
