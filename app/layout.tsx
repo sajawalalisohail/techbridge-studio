@@ -50,8 +50,12 @@ export default function RootLayout({
         <IntroOverlayClient />
         <LenisProvider>
           <Navbar />
-          <main>{children}</main>
-          <Footer />
+          <div className="relative z-10 bg-background">
+            <main>{children}</main>
+          </div>
+          <div className="sticky bottom-0 z-0 h-[var(--footer-h)]">
+            <Footer />
+          </div>
         </LenisProvider>
       </body>
     </html>

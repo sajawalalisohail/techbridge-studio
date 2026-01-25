@@ -20,13 +20,8 @@ export default function Footer() {
   const currentYear = new Date().getFullYear()
 
   return (
-    <footer className="relative overflow-hidden border-t border-border bg-[color:var(--surface)]">
-      <div aria-hidden className="pointer-events-none absolute inset-0">
-        <div className="absolute -top-32 left-1/2 h-[420px] w-[420px] -translate-x-1/2 rounded-full bg-accent/10 blur-3xl" />
-        <div className="absolute bottom-[-30%] right-[-10%] h-[360px] w-[360px] rounded-full bg-[rgb(var(--accent-glow-rgb)/0.12)] blur-3xl" />
-        <div className="absolute inset-0 bg-gradient-to-b from-background/0 via-background/10 to-background/30" />
-      </div>
-      <div aria-hidden className="relative h-10 bg-gradient-to-b from-transparent to-[color:var(--surface)]" />
+    <footer className="relative h-full border-t border-border bg-transparent">
+      <div aria-hidden className="relative h-10 bg-gradient-to-b from-transparent to-transparent" />
       <Container className="relative">
         <div className="py-16 md:py-20">
           {/* Main Footer Content */}

@@ -18,11 +18,18 @@
   --background-rgb: 2 6 23;
   --danger: #f87171;
   --danger-foreground: #0f172a;
+  --footer-h: 520px;
 
   /* Dark background system (intensity controls) */
   --bg-gradient-opacity: 0.18;
   --bg-glow-opacity: 0.14;
   --bg-noise-opacity: 0.05;
+}
+
+@media (min-width: 768px) {
+  :root {
+    --footer-h: 420px;
+  }
 }
 
 @media (prefers-color-scheme: dark) {
