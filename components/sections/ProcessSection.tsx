@@ -2,7 +2,7 @@
 
 import { useRef } from 'react'
 import { motion, useScroll, useTransform } from 'framer-motion'
-import { Container, Section, Reveal } from '@/components/ui'
+import { Container, Section, StaggerContainer, StaggerItem } from '@/components/ui'
 
 const processSteps = [
   {
@@ -47,23 +47,23 @@ export default function ProcessSection() {
   return (
     <Section id="process" className="bg-muted">
       <Container>
-        <div className="mb-16">
-          <Reveal>
+        <StaggerContainer className="mb-16">
+          <StaggerItem>
             <p className="text-sm font-medium text-muted-foreground uppercase tracking-wider mb-4">
               Our Process
             </p>
-          </Reveal>
-          <Reveal delay={0.1}>
+          </StaggerItem>
+          <StaggerItem>
             <h2 className="text-headline-sm md:text-headline font-semibold tracking-tight max-w-2xl">
               How we work together.
             </h2>
-          </Reveal>
-          <Reveal delay={0.2}>
+          </StaggerItem>
+          <StaggerItem>
             <p className="text-muted-foreground mt-4 max-w-2xl">
               A clear, predictable process that keeps you informed and in control.
             </p>
-          </Reveal>
-        </div>
+          </StaggerItem>
+        </StaggerContainer>
 
         <div ref={containerRef} className="relative">
           {/* Progress Line */}
@@ -78,40 +78,42 @@ export default function ProcessSection() {
           </div>
 
           {/* Steps */}
-          <div className="space-y-16 md:space-y-24">
+          <StaggerContainer className="space-y-16 md:space-y-24">
             {processSteps.map((step) => (
-              <div key={step.id} className="relative pl-8 md:pl-20">
-                {/* Step Number */}
-                <div className="absolute left-0 md:left-8 -translate-x-1/2 w-4 h-4 rounded-full bg-background border-2 border-foreground" />
-                
-                <div className="grid md:grid-cols-12 gap-6">
-                  <div className="md:col-span-2">
-                    <span className="text-sm font-medium text-muted-foreground">
-                      {step.id}
-                    </span>
-                  </div>
-                  <div className="md:col-span-10">
-                    <h3 className="text-title font-semibold mb-3">
-                      {step.title}
-                    </h3>
-                    <p className="text-muted-foreground mb-4 max-w-xl">
-                      {step.description}
-                    </p>
-                    <ul className="flex flex-wrap gap-3">
-                      {step.details.map((detail) => (
-                        <li 
-                          key={detail}
-                          className="text-xs font-medium text-muted-foreground bg-background px-3 py-1.5 rounded-full border border-border"
-                        >
-                          {detail}
-                        </li>
-                      ))}
-                    </ul>
+              <StaggerItem key={step.id}>
+                <div className="relative pl-8 md:pl-20">
+                  {/* Step Number */}
+                  <div className="absolute left-0 md:left-8 -translate-x-1/2 w-4 h-4 rounded-full bg-background border-2 border-foreground" />
+                  
+                  <div className="grid md:grid-cols-12 gap-6">
+                    <div className="md:col-span-2">
+                      <span className="text-sm font-medium text-muted-foreground">
+                        {step.id}
+                      </span>
+                    </div>
+                    <div className="md:col-span-10">
+                      <h3 className="text-title font-semibold mb-3">
+                        {step.title}
+                      </h3>
+                      <p className="text-muted-foreground mb-4 max-w-xl">
+                        {step.description}
+                      </p>
+                      <ul className="flex flex-wrap gap-3">
+                        {step.details.map((detail) => (
+                          <li 
+                            key={detail}
+                            className="text-xs font-medium text-muted-foreground bg-background px-3 py-1.5 rounded-full border border-border"
+                          >
+                            {detail}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
                   </div>
                 </div>
-              </div>
+              </StaggerItem>
             ))}
-          </div>
+          </StaggerContainer>
         </div>
       </Container>
     </Section>

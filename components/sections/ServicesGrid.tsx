@@ -1,6 +1,4 @@
-'use client'
-
-import { Container, Section, Card, CardTitle, CardDescription, Button, Reveal, StaggerContainer, StaggerItem } from '@/components/ui'
+import { Container, Section, Card, CardTitle, CardDescription, Button, StaggerContainer, StaggerItem } from '@/components/ui'
 
 const services = [
   {
@@ -45,18 +43,18 @@ export default function ServicesGrid() {
   return (
     <Section id="services">
       <Container>
-        <div className="mb-16">
-          <Reveal>
+        <StaggerContainer className="mb-16">
+          <StaggerItem>
             <p className="text-sm font-medium text-muted-foreground uppercase tracking-wider mb-4">
               What We Build
             </p>
-          </Reveal>
-          <Reveal delay={0.1}>
+          </StaggerItem>
+          <StaggerItem>
             <h2 className="text-headline-sm md:text-headline font-semibold tracking-tight">
               Four ways to work together.
             </h2>
-          </Reveal>
-        </div>
+          </StaggerItem>
+        </StaggerContainer>
 
         <StaggerContainer className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {services.map((service) => (
@@ -88,13 +86,13 @@ export default function ServicesGrid() {
           ))}
         </StaggerContainer>
 
-        <Reveal delay={0.3}>
-          <div className="mt-12 text-center">
+        <StaggerContainer className="mt-12 text-center">
+          <StaggerItem>
             <Button href="/services" variant="outline">
               View All Services
             </Button>
-          </div>
-        </Reveal>
+          </StaggerItem>
+        </StaggerContainer>
       </Container>
     </Section>
   )

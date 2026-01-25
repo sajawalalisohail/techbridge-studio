@@ -151,7 +151,7 @@ export default function ServicesPage() {
 
                     {/* Features */}
                     <Card padding="lg">
-                      <CardTitle className="mb-6">What's included</CardTitle>
+                      <CardTitle className="mb-6">What&apos;s included</CardTitle>
                       <ul className="space-y-4">
                         {service.features.map((feature) => (
                           <li key={feature} className="flex items-start gap-3">
@@ -181,7 +181,7 @@ export default function ServicesPage() {
             <Reveal delay={0.1}>
               <p className="text-muted-foreground mb-8">
                 These tiers are starting points. Every project is custom-scoped. 
-                If you have something specific in mind, let's talk.
+                If you have something specific in mind, let&apos;s talk.
               </p>
             </Reveal>
             <Reveal delay={0.2}>

@@ -24,7 +24,7 @@ export default function QuotePage() {
           </Reveal>
           <Reveal delay={0.2}>
             <p className="text-body-lg text-muted-foreground mb-12">
-              Fill out the form below and we'll get back to you within 24 hours 
+              Fill out the form below and we&apos;ll get back to you within 24 hours 
               with next steps and a preliminary estimate.
             </p>
           </Reveal>

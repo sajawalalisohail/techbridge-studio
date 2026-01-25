@@ -1,7 +1,4 @@
-'use client'
-
-import Image from 'next/image'
-import { Container, Section, Card, Reveal, StaggerContainer, StaggerItem } from '@/components/ui'
+import { Container, Section, Card, StaggerContainer, StaggerItem } from '@/components/ui'
 
 const projects = [
   {
@@ -37,24 +34,24 @@ export default function SelectedWork() {
   return (
     <Section id="work" className="bg-muted">
       <Container>
-        <div className="mb-16">
-          <Reveal>
+        <StaggerContainer className="mb-16">
+          <StaggerItem>
             <p className="text-sm font-medium text-muted-foreground uppercase tracking-wider mb-4">
               Selected Work
             </p>
-          </Reveal>
-          <Reveal delay={0.1}>
+          </StaggerItem>
+          <StaggerItem>
             <h2 className="text-headline-sm md:text-headline font-semibold tracking-tight">
               Sample builds from our studio.
             </h2>
-          </Reveal>
-          <Reveal delay={0.2}>
+          </StaggerItem>
+          <StaggerItem>
             <p className="text-muted-foreground mt-4 max-w-2xl">
               Representative examples of the systems we build. Each project is custom — 
               these showcase our approach and capabilities.
             </p>
-          </Reveal>
-        </div>
+          </StaggerItem>
+        </StaggerContainer>
 
         <StaggerContainer className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {projects.map((project) => (

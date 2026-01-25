@@ -1,5 +1,3 @@
-'use client'
-
 import { Container, Section, Reveal } from '@/components/ui'
 
 const techStack = [

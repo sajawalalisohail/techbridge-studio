@@ -1,6 +1,4 @@
-'use client'
-
-import { Container, Section, Reveal, StaggerContainer, StaggerItem } from '@/components/ui'
+import { Container, Section, StaggerContainer, StaggerItem } from '@/components/ui'
 
 const useCases = [
   {
@@ -39,18 +37,18 @@ export default function UseCases() {
   return (
     <Section id="use-cases">
       <Container>
-        <div className="mb-16">
-          <Reveal>
+        <StaggerContainer className="mb-16">
+          <StaggerItem>
             <p className="text-sm font-medium text-muted-foreground uppercase tracking-wider mb-4">
               Use Cases
             </p>
-          </Reveal>
-          <Reveal delay={0.1}>
+          </StaggerItem>
+          <StaggerItem>
             <h2 className="text-headline-sm md:text-headline font-semibold tracking-tight max-w-2xl">
               Common problems we solve.
             </h2>
-          </Reveal>
-        </div>
+          </StaggerItem>
+        </StaggerContainer>
 
         <StaggerContainer className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
           {useCases.map((useCase) => (

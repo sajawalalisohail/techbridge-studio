@@ -25,7 +25,6 @@ export default function LenisProvider({ children }: LenisProviderProps) {
       orientation: 'vertical',
       gestureOrientation: 'vertical',
       smoothWheel: true,
-      smoothTouch: false,
     })
 
     let rafId = 0

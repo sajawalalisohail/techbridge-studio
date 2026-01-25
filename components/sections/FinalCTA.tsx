@@ -1,5 +1,3 @@
-'use client'
-
 import { Container, Section, Button, Reveal } from '@/components/ui'
 
 export default function FinalCTA() {
@@ -18,7 +16,7 @@ export default function FinalCTA() {
           </Reveal>
           <Reveal delay={0.1}>
             <p className="text-background/75 text-body-lg mb-10">
-              Tell us about your project. We'll get back to you within 24 hours 
+              Tell us about your project. We&apos;ll get back to you within 24 hours 
               with next steps.
             </p>
           </Reveal>

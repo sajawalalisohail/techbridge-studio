@@ -1,6 +1,4 @@
-'use client'
-
-import { Container, Section, Accordion, Reveal } from '@/components/ui'
+import { Container, Section, Accordion, Reveal, StaggerContainer, StaggerItem } from '@/components/ui'
 
 const faqItems = [
   {
@@ -39,26 +37,28 @@ export default function FAQ() {
   return (
     <Section id="faq">
       <Container size="sm">
-        <div className="mb-12">
-          <Reveal>
+        <StaggerContainer className="mb-12">
+          <StaggerItem>
             <p className="text-sm font-medium text-muted-foreground uppercase tracking-wider mb-4">
               FAQ
             </p>
-          </Reveal>
-          <Reveal delay={0.1}>
+          </StaggerItem>
+          <StaggerItem>
             <h2 className="text-headline-sm md:text-headline font-semibold tracking-tight">
               Common questions.
             </h2>
-          </Reveal>
-        </div>
+          </StaggerItem>
+        </StaggerContainer>
 
-        <Accordion 
-          items={faqItems.map(item => ({
-            id: item.id,
-            title: item.title,
-            content: <p>{item.content}</p>,
-          }))}
-        />
+        <Reveal>
+          <Accordion 
+            items={faqItems.map(item => ({
+              id: item.id,
+              title: item.title,
+              content: <p>{item.content}</p>,
+            }))}
+          />
+        </Reveal>
       </Container>
     </Section>
   )
