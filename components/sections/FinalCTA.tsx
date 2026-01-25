@@ -9,18 +9,18 @@ export default function FinalCTA() {
             <div className="absolute left-1/2 top-[-30%] h-[420px] w-[420px] -translate-x-1/2 rounded-full bg-background/10 blur-3xl" />
             <div className="absolute right-[-10%] top-[15%] h-[320px] w-[320px] rounded-full bg-white/5 blur-3xl" />
           </div>
-          <Reveal>
+          <Reveal once>
             <h2 className="text-headline-sm md:text-headline font-semibold tracking-tight mb-6">
               Ready to build something?
             </h2>
           </Reveal>
-          <Reveal delay={0.1}>
+          <Reveal delay={0.1} once>
             <p className="text-background/75 text-body-lg mb-10">
               Tell us about your project. We&apos;ll get back to you within 24 hours 
               with next steps.
             </p>
           </Reveal>
-          <Reveal delay={0.2}>
+          <Reveal delay={0.2} once>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button 
                 href="/quote" 
