@@ -1,26 +1,38 @@
 # TechBridge - Modern Software Studio Website
 
-A premium, studio-style website built with Next.js 15, featuring smooth scrolling, subtle animations, and a complete lead management system.
+A premium, cinematic studio website built with Next.js 15, featuring GSAP-powered animations, smooth scrolling, and a complete lead management system. Designed to feel like a creative technology studio with motion-first, engineering-led branding.
 
 ## Tech Stack
 
 - **Framework**: Next.js 15 (App Router)
 - **Language**: TypeScript
 - **Styling**: Tailwind CSS
-- **Animations**: Framer Motion
+- **Animations**: GSAP + ScrollTrigger, Framer Motion
 - **Smooth Scroll**: Lenis
 - **Backend**: Supabase (Auth + Database)
 - **Deployment**: Vercel
 
 ## Features
 
-- Modern, minimal design with large typography
-- Smooth scrolling experience (desktop)
-- Scroll-reveal animations
-- Responsive design (mobile-first)
+### Cinematic Experience
+- **Intro Sequence**: GSAP-powered opening animation with gradient text sweep
+- **Animated Background**: Floating gradient orbs with noise overlay
+- **Scroll Animations**: GSAP ScrollTrigger for section reveals
+- **Page Transitions**: Framer Motion route animations
+- **Parallax Effects**: Subtle depth on hero and CTA sections
+
+### Design
+- Dark theme with accent color system
+- Large typography with tight tracking
+- Generous spacing and visual hierarchy
+- Hover micro-interactions on cards
+- Smooth scrolling (desktop, respects reduced motion)
+
+### Functionality
 - Lead capture form with validation
 - Protected admin dashboard
-- Dark mode support
+- Responsive design (mobile-first)
+- Accessibility: respects `prefers-reduced-motion`
 
 ## Pages
 

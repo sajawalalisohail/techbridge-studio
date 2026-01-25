@@ -154,7 +154,7 @@ export default function QuoteForm() {
           <div className="text-5xl mb-6">✓</div>
           <h2 className="text-title font-semibold mb-4">Thanks for reaching out!</h2>
           <p className="text-muted-foreground mb-6">
-            We've received your project details and will get back to you within 24 hours.
+            We&apos;ve received your project details and will get back to you within 24 hours.
           </p>
           <Button href="/" variant="outline">
             Back to Home
@@ -360,7 +360,7 @@ export default function QuoteForm() {
 
       <p className="text-sm text-muted-foreground">
         By submitting this form, you agree to our privacy policy. 
-        We'll only use your information to respond to your inquiry.
+        We&apos;ll only use your information to respond to your inquiry.
       </p>
     </form>
   )
