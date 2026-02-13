@@ -20,22 +20,21 @@ export default function Footer() {
   const currentYear = new Date().getFullYear()
 
   return (
-    <footer className="relative h-full border-t border-border bg-transparent">
-      <div aria-hidden className="relative h-10 bg-gradient-to-b from-transparent to-transparent" />
+    <footer className="relative w-full border-t border-border/60 bg-transparent">
       <Container className="relative">
         <div className="py-16 md:py-20">
           {/* Main Footer Content */}
           <div className="grid grid-cols-1 md:grid-cols-12 gap-12 md:gap-8">
             {/* Brand Column */}
             <div className="md:col-span-5">
-              <Link 
-                href="/" 
+              <Link
+                href="/"
                 className="text-xl font-semibold tracking-tight inline-block mb-4"
               >
                 TechBridge
               </Link>
               <p className="text-muted-foreground max-w-sm mb-6">
-                Ship fast. Build clean. Automate operations. 
+                Ship fast. Build clean. Automate operations.
                 We build software that removes manual work and helps businesses scale.
               </p>
               <p className="text-sm text-muted-foreground">
@@ -83,14 +82,14 @@ export default function Footer() {
               © {currentYear} TechBridge. All rights reserved.
             </p>
             <div className="flex items-center gap-6">
-              <Link 
-                href="/privacy" 
+              <Link
+                href="/privacy"
                 className="text-sm text-muted-foreground hover:text-foreground transition-colors"
               >
                 Privacy
               </Link>
-              <Link 
-                href="/terms" 
+              <Link
+                href="/terms"
                 className="text-sm text-muted-foreground hover:text-foreground transition-colors"
               >
                 Terms

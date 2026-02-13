@@ -1,11 +1,13 @@
 import type { Metadata } from 'next'
 import { Space_Grotesk } from 'next/font/google'
 import './globals.css'
+import { NeuralInteractionProvider } from '@/providers/NeuralInteractionProvider'
 import LenisProvider from '@/providers/LenisProvider'
 import Navbar from '@/components/layout/Navbar'
 import Footer from '@/components/layout/Footer'
 import IntroOverlayShell from '@/components/IntroOverlayShell'
 import IntroOverlayClient from '@/components/IntroOverlayClient'
+import NeuralBackgroundLoader from '@/components/three/NeuralBackgroundLoader'
 
 const spaceGrotesk = Space_Grotesk({
   subsets: ['latin'],
@@ -44,19 +46,20 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en" className={spaceGrotesk.variable} suppressHydrationWarning >
+    <html lang="en" className={spaceGrotesk.variable} suppressHydrationWarning>
       <body className="min-h-screen bg-background text-foreground antialiased">
         <IntroOverlayShell />
         <IntroOverlayClient />
-        <LenisProvider>
-          <Navbar />
-          <div className="relative z-10 bg-background">
-            <main>{children}</main>
-          </div>
-          <div className="sticky bottom-0 z-0 h-[var(--footer-h)]">
-            <Footer />
-          </div>
-        </LenisProvider>
+        <NeuralInteractionProvider>
+          <NeuralBackgroundLoader />
+          <LenisProvider>
+            <Navbar />
+            <div className="relative z-10 min-h-screen bg-transparent">
+              <main className="bg-transparent">{children}</main>
+              <Footer />
+            </div>
+          </LenisProvider>
+        </NeuralInteractionProvider>
       </body>
     </html>
   )

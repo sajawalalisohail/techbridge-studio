@@ -1,7 +1,7 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
-import { motion, useScroll } from 'framer-motion'
+import { useRef, useState, useEffect, useCallback } from 'react'
+import { motion, useScroll, useSpring } from 'framer-motion'
 import { Container, Section, StaggerContainer, StaggerItem } from '@/components/ui'
 
 const processSteps = [
@@ -37,42 +37,121 @@ const processSteps = [
   },
 ]
 
+function ProcessStep({
+  step,
+  isActive,
+  setRef
+}: {
+  step: typeof processSteps[0],
+  isActive: boolean,
+  setRef: (el: HTMLDivElement | null) => void
+}) {
+  return (
+    <StaggerItem
+      className={`transition-all duration-500 ease-out ${isActive ? 'opacity-100 translate-x-3 scale-[1.02]' : 'opacity-30 grayscale-[0.5] scale-100'}`}
+    >
+      <div
+        ref={setRef}
+        className="relative pl-8 md:pl-20"
+      >
+        {/* Step Number */}
+        <div
+          className={`absolute left-0 md:left-8 -translate-x-1/2 w-4 h-4 rounded-full border-2 transition-all duration-500 ${isActive
+            ? 'bg-foreground border-foreground shadow-[0_0_15px_rgba(255,255,255,0.5)] scale-110'
+            : 'bg-transparent border-muted-foreground/50 scale-100'
+            }`}
+        />
+
+        <div className="grid md:grid-cols-12 gap-6">
+          <div className="md:col-span-2">
+            <span className={`text-sm font-medium transition-colors duration-500 ${isActive ? 'text-accent' : 'text-muted-foreground'}`}>
+              {step.id}
+            </span>
+          </div>
+          <div className="md:col-span-10">
+            <h3 className={`text-title font-semibold mb-3 transition-colors duration-500 ${isActive ? 'text-foreground' : 'text-muted-foreground'}`}>
+              {step.title}
+            </h3>
+            <p className={`mb-4 max-w-xl transition-colors duration-500 ${isActive ? 'text-foreground/90' : 'text-muted-foreground'}`}>
+              {step.description}
+            </p>
+            <ul className="flex flex-wrap gap-3">
+              {step.details.map((detail) => (
+                <li
+                  key={detail}
+                  className={`text-xs font-medium px-3 py-1.5 rounded-full border transition-all duration-500 ${isActive
+                    ? 'text-foreground/90 border-foreground/20 bg-background/50 backdrop-blur-sm'
+                    : 'text-muted-foreground bg-transparent border-transparent'
+                    }`}
+                >
+                  {detail}
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      </div>
+    </StaggerItem>
+  )
+}
+
 export default function ProcessSection() {
   const containerRef = useRef<HTMLDivElement>(null)
-  const [activeIndex, setActiveIndex] = useState(0)
-  const stepRefs = useRef<Array<HTMLDivElement | null>>([])
+  const stepsRef = useRef<(HTMLDivElement | null)[]>([])
+  const [activeStepIndex, setActiveStepIndex] = useState(0)
+
   const { scrollYProgress } = useScroll({
     target: containerRef,
     offset: ['start end', 'end start'],
   })
 
+  // Smooth out the scroll progress
+  const scaleY = useSpring(scrollYProgress, {
+    stiffness: 60,
+    damping: 20,
+    restDelta: 0.001
+  })
+
   useEffect(() => {
-    const targets = stepRefs.current.filter(Boolean) as HTMLDivElement[]
-    if (!targets.length) return
+    let lastRun = 0
+    const throttleDelay = 100 // ms
 
-    const observer = new IntersectionObserver(
-      (entries) => {
-        const visible = entries
-          .filter((entry) => entry.isIntersecting)
-          .sort((a, b) => b.intersectionRatio - a.intersectionRatio)
+    const handleScroll = () => {
+      const now = Date.now()
+      if (now - lastRun < throttleDelay) return
+      lastRun = now
 
-        if (!visible.length) return
-        const index = targets.indexOf(visible[0].target as HTMLDivElement)
-        if (index >= 0) setActiveIndex(index)
-      },
-      {
-        root: null,
-        rootMargin: '-35% 0px -35% 0px',
-        threshold: [0.1, 0.3, 0.6],
-      }
-    )
+      const viewportCenter = window.innerHeight / 2
+      let closestIndex = 0
+      let closestDistance = Infinity
 
-    targets.forEach((el) => observer.observe(el))
-    return () => observer.disconnect()
+      stepsRef.current.forEach((step, index) => {
+        if (!step) return
+        const rect = step.getBoundingClientRect()
+        // Calculate distance from center of viewport to center of element
+        const elementCenter = rect.top + rect.height / 2
+        const distance = Math.abs(viewportCenter - elementCenter)
+
+        if (distance < closestDistance) {
+          closestDistance = distance
+          closestIndex = index
+        }
+      })
+
+      setActiveStepIndex(closestIndex)
+    }
+
+    window.addEventListener('scroll', handleScroll, { passive: true })
+    // Initial check
+    handleScroll()
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll)
+    }
   }, [])
 
   return (
-    <Section id="process" className="bg-muted">
+    <Section id="process">
       <Container>
         <StaggerContainer className="mb-16">
           <StaggerItem>
@@ -94,72 +173,26 @@ export default function ProcessSection() {
 
         <div ref={containerRef} className="relative">
           {/* Progress Line */}
-          <div className="absolute left-0 md:left-8 top-0 bottom-0 w-px bg-border">
+          <div className="absolute left-0 md:left-8 top-0 bottom-0 w-px bg-border/30">
             <motion.div
-              className="w-full bg-foreground origin-top"
-              style={{ 
-                scaleY: scrollYProgress,
+              className="w-full bg-accent origin-top shadow-[0_0_10px_var(--accent)]"
+              style={{
+                scaleY,
                 height: '100%',
               }}
             />
           </div>
 
           {/* Steps */}
-          <StaggerContainer className="space-y-16 md:space-y-24">
-            {processSteps.map((step, index) => {
-              const isActive = index === activeIndex
-              return (
-              <StaggerItem 
+          <StaggerContainer className="space-y-24 md:space-y-32 py-12">
+            {processSteps.map((step, index) => (
+              <ProcessStep
                 key={step.id}
-                className={`transition-all duration-300 ${isActive ? 'scale-[1.01] opacity-100' : 'opacity-60'}`}
-              >
-                <div
-                  ref={(el) => {
-                    stepRefs.current[index] = el
-                  }}
-                  className="relative pl-8 md:pl-20"
-                >
-                  {/* Step Number */}
-                  <div
-                    className={`absolute left-0 md:left-8 -translate-x-1/2 w-4 h-4 rounded-full border-2 transition-all duration-300 ${
-                      isActive
-                        ? 'bg-foreground border-foreground shadow-[0_0_0_6px_rgba(10,10,10,0.08)]'
-                        : 'bg-background border-foreground'
-                    }`}
-                  />
-                  
-                  <div className="grid md:grid-cols-12 gap-6">
-                    <div className="md:col-span-2">
-                      <span className={`text-sm font-medium transition-colors duration-300 ${isActive ? 'text-foreground' : 'text-muted-foreground'}`}>
-                        {step.id}
-                      </span>
-                    </div>
-                    <div className="md:col-span-10">
-                      <h3 className={`text-title font-semibold mb-3 transition-colors duration-300 ${isActive ? 'text-foreground' : 'text-foreground/70'}`}>
-                        {step.title}
-                      </h3>
-                      <p className={`mb-4 max-w-xl transition-colors duration-300 ${isActive ? 'text-foreground/80' : 'text-muted-foreground'}`}>
-                        {step.description}
-                      </p>
-                      <ul className="flex flex-wrap gap-3">
-                        {step.details.map((detail) => (
-                          <li 
-                            key={detail}
-                            className={`text-xs font-medium px-3 py-1.5 rounded-full border transition-colors duration-300 ${
-                              isActive
-                                ? 'text-foreground/80 border-foreground/20 bg-background'
-                                : 'text-muted-foreground bg-background border-border'
-                            }`}
-                          >
-                            {detail}
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  </div>
-                </div>
-              </StaggerItem>
-            )})}
+                step={step}
+                isActive={index === activeStepIndex}
+                setRef={(el) => { stepsRef.current[index] = el }}
+              />
+            ))}
           </StaggerContainer>
         </div>
       </Container>

@@ -2,7 +2,10 @@ import { Container, Section, Button, Reveal } from '@/components/ui'
 
 export default function FinalCTA() {
   return (
-    <Section className="relative isolate overflow-hidden bg-[color:var(--surface-elevated)] text-foreground">
+    <Section
+      className="relative isolate overflow-hidden text-foreground"
+      style={{ backgroundColor: 'var(--section-surface)' }}
+    >
       <Container>
         <div className="text-center max-w-2xl mx-auto">
           <div className="pointer-events-none absolute inset-0 -z-10">
@@ -16,22 +19,22 @@ export default function FinalCTA() {
           </Reveal>
           <Reveal delay={0.1} once>
             <p className="text-foreground/70 text-body-lg mb-10">
-              Tell us about your project. We&apos;ll get back to you within 24 hours 
+              Tell us about your project. We&apos;ll get back to you within 24 hours
               with next steps.
             </p>
           </Reveal>
           <Reveal delay={0.2} once>
             <div className="relative z-10 flex flex-col sm:flex-row gap-4 justify-center">
-              <Button 
-                href="/quote" 
+              <Button
+                href="/quote"
                 size="lg"
                 className="bg-accent text-accent-foreground ring-1 ring-accent/60 shadow-[0_16px_30px_-18px_rgb(var(--accent-rgb)/0.55)] hover:bg-accent/90"
               >
                 Request a Quote
               </Button>
-              <Button 
-                href="https://cal.com" 
-                variant="outline" 
+              <Button
+                href="https://cal.com"
+                variant="outline"
                 size="lg"
                 className="border-foreground/25 text-foreground bg-foreground/5 hover:bg-foreground/10"
                 target="_blank"

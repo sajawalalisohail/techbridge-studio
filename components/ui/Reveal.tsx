@@ -1,15 +1,17 @@
 'use client'
 
-import { ReactNode, useEffect, useMemo, useRef, useState } from 'react'
-import { motion, useInView, useReducedMotion, Variants } from 'framer-motion'
+import { ReactNode, useMemo } from 'react'
+import { motion, useReducedMotion, Variants } from 'framer-motion'
 
+// Boosted presets for better visibility ("Premium Feel")
 const motionPresets = {
   normal: {
-    duration: 0.55,
+    duration: 0.8,
     ease: [0.22, 1, 0.36, 1] as const,
-    distance: 18,
-    stagger: 0.08,
-    viewportAmount: 0.25,
+    distance: 40,
+    stagger: 0.15,
+    viewportAmount: 0.2,
+    margin: "-5%" // Slightly better overlap
   },
   debug: {
     duration: 0.7,
@@ -17,20 +19,22 @@ const motionPresets = {
     distance: 24,
     stagger: 0.12,
     viewportAmount: 0.25,
+    margin: "0%"
   },
 }
 
 const getMotionFlags = () => {
   if (typeof window === 'undefined') {
-    return { forceMotion: false, boost: false, debug: false }
+    return { forceMotion: false, boost: false }
   }
   const params = new URLSearchParams(window.location.search)
   return {
     forceMotion: params.get('motion') === '1',
     boost: params.get('motionBoost') === '1',
-    debug: process.env.NODE_ENV !== 'production' && params.get('motionDebug') === '1',
   }
 }
+
+export type RevealVariant = 'fadeUp' | 'fadeDown' | 'fadeIn' | 'slideLeft' | 'slideRight' | 'scaleIn' | 'clipReveal'
 
 interface RevealProps {
   children: ReactNode
@@ -38,9 +42,55 @@ interface RevealProps {
   delay?: number
   duration?: number
   name?: string
+  variant?: RevealVariant
+  /** @deprecated use variant="fadeUp" or variant="slideLeft" etc */
   direction?: 'up' | 'down' | 'left' | 'right' | 'none'
   distance?: number
   once?: boolean
+  immediate?: boolean
+}
+
+const getVariants = (type: RevealVariant, distance: number, duration: number, ease: any): Variants => {
+  const transition = { duration, ease }
+
+  switch (type) {
+    case 'fadeUp':
+      return {
+        hidden: { opacity: 0, y: distance },
+        show: { opacity: 1, y: 0, transition }
+      }
+    case 'fadeDown':
+      return {
+        hidden: { opacity: 0, y: -distance },
+        show: { opacity: 1, y: 0, transition }
+      }
+    case 'slideLeft':
+      return {
+        hidden: { opacity: 0, x: 80 },
+        show: { opacity: 1, x: 0, transition }
+      }
+    case 'slideRight':
+      return {
+        hidden: { opacity: 0, x: -80 },
+        show: { opacity: 1, x: 0, transition }
+      }
+    case 'scaleIn':
+      return {
+        hidden: { opacity: 0, scale: 0.9 },
+        show: { opacity: 1, scale: 1, transition }
+      }
+    case 'clipReveal':
+      return {
+        hidden: { opacity: 0, clipPath: 'inset(100% 0% 0% 0%)', y: 20 },
+        show: { opacity: 1, clipPath: 'inset(0% 0% 0% 0%)', y: 0, transition: { ...transition, duration: duration * 1.2 } }
+      }
+    case 'fadeIn':
+    default:
+      return {
+        hidden: { opacity: 0 },
+        show: { opacity: 1, transition }
+      }
+  }
 }
 
 export default function Reveal({
@@ -48,99 +98,49 @@ export default function Reveal({
   className = '',
   delay = 0,
   duration = motionPresets.normal.duration,
-  name,
-  direction = 'up',
+  variant,
+  direction,
   distance = motionPresets.normal.distance,
-  once = false,
+  once = false, // Default to false for bidirectional scroll
+  immediate = false,
 }: RevealProps) {
-  const ref = useRef<HTMLDivElement>(null)
-  const [mounted, setMounted] = useState(false)
-  const [revealState, setRevealState] = useState<'hidden' | 'show'>('show')
   const prefersReducedMotion = useReducedMotion()
-  const { forceMotion, debug, boost } = useMemo(getMotionFlags, [])
+  const { forceMotion, boost } = useMemo(getMotionFlags, [])
   const spec = boost ? motionPresets.debug : motionPresets.normal
   const motionEnabled = forceMotion || !prefersReducedMotion
-  const shouldAnimate = mounted && motionEnabled
-  const isInView = useInView(ref, { amount: spec.viewportAmount, once })
-  const hasShownRef = useRef(false)
-  const mountTimeRef = useRef<number | null>(null)
 
-  const getInitialPosition = () => {
-    switch (direction) {
-      case 'up':
-        return { y: distance }
-      case 'down':
-        return { y: -distance }
-      case 'left':
-        return { x: distance }
-      case 'right':
-        return { x: -distance }
-      case 'none':
-        return {}
-      default:
-        return { y: distance }
-    }
+  // Resolve variant from prop or legacy direction
+  let effectiveVariant: RevealVariant = variant || 'fadeUp'
+  if (!variant && direction) {
+    if (direction === 'up') effectiveVariant = 'fadeUp'
+    if (direction === 'down') effectiveVariant = 'fadeDown'
+    if (direction === 'left') effectiveVariant = 'slideLeft'
+    if (direction === 'right') effectiveVariant = 'slideRight'
+    if (direction === 'none') effectiveVariant = 'fadeIn'
   }
 
-  const variants: Variants = {
-    hidden: {
-      opacity: 0,
-      ...getInitialPosition(),
-    },
-    show: {
-      opacity: 1,
-      x: 0,
-      y: 0,
-      transition: {
-        duration: duration ?? spec.duration,
-        delay,
-        ease: spec.ease,
-      },
-    },
+  const selectedVariants = getVariants(effectiveVariant, distance, duration, spec.ease)
+
+  if (delay > 0 && selectedVariants.show && !Array.isArray(selectedVariants.show)) {
+    // @ts-ignore
+    selectedVariants.show.transition = { ...selectedVariants.show.transition, delay }
   }
 
-  useEffect(() => {
-    setMounted(true)
-    if (debug) {
-      mountTimeRef.current = typeof performance !== 'undefined' ? performance.now() : Date.now()
-      console.log('[Reveal] mounted:', name ?? 'Reveal', mountTimeRef.current)
-    }
-  }, [])
-
-  useEffect(() => {
-    if (!mounted) return
-    const el = ref.current
-    if (!el) return
-    const rect = el.getBoundingClientRect()
-    const vh = window.innerHeight || 0
-    const threshold = spec.viewportAmount
-    const inViewNow = rect.top < vh * (1 - threshold) && rect.bottom > vh * threshold
-    setRevealState(inViewNow ? 'show' : 'hidden')
-    if (inViewNow) {
-      hasShownRef.current = true
-    }
-  }, [mounted, spec.viewportAmount])
-
-  useEffect(() => {
-    if (!mounted) return
-    if (isInView) {
-      if (!hasShownRef.current && debug) {
-        const now = typeof performance !== 'undefined' ? performance.now() : Date.now()
-        console.log('[Reveal] first in view:', name ?? 'Reveal', now, mountTimeRef.current ? now - mountTimeRef.current : undefined)
-      }
-      setRevealState('show')
-      hasShownRef.current = true
-    } else if (!once && hasShownRef.current) {
-      setRevealState('hidden')
-    }
-  }, [debug, isInView, mounted, name, once])
+  if (!motionEnabled) {
+    return <div className={className}>{children}</div>
+  }
 
   return (
     <motion.div
-      ref={ref}
-      initial={false}
-      animate={shouldAnimate ? revealState : 'show'}
-      variants={variants}
+      initial="hidden"
+      animate={immediate ? "show" : undefined}
+      whileInView={immediate ? undefined : "show"}
+      viewport={immediate ? undefined : {
+        amount: spec.viewportAmount,
+        once,
+        margin: spec.margin
+      }}
+      variants={selectedVariants}
       className={className}
     >
       {children}
@@ -153,77 +153,58 @@ interface StaggerContainerProps {
   children: ReactNode
   className?: string
   staggerDelay?: number
+  delay?: number
   once?: boolean
+  viewportAmount?: number
+  immediate?: boolean
 }
 
-export function StaggerContainer({ 
-  children, 
+export function StaggerContainer({
+  children,
   className = '',
   staggerDelay = motionPresets.normal.stagger,
-  once = false
+  delay = 0,
+  once = false, // Default to false for bidirectional scroll
+  viewportAmount,
+  immediate = false
 }: StaggerContainerProps) {
-  const ref = useRef<HTMLDivElement>(null)
-  const [mounted, setMounted] = useState(false)
-  const [revealState, setRevealState] = useState<'hidden' | 'show'>('show')
   const prefersReducedMotion = useReducedMotion()
-  const { forceMotion, boost, debug } = useMemo(getMotionFlags, [])
+  const { forceMotion, boost } = useMemo(getMotionFlags, [])
   const spec = boost ? motionPresets.debug : motionPresets.normal
   const motionEnabled = forceMotion || !prefersReducedMotion
-  const shouldAnimate = mounted && motionEnabled
-  const isInView = useInView(ref, { amount: spec.viewportAmount, once })
-  const hasShownRef = useRef(false)
-  const mountTimeRef = useRef<number | null>(null)
+  const amount = viewportAmount || spec.viewportAmount
 
   const containerVariants: Variants = {
-    hidden: { opacity: 1 },
+    hidden: {
+      opacity: 0, // Ensure container hides children 
+      transition: {
+        when: "afterChildren" // Hide after children
+      }
+    },
     show: {
       opacity: 1,
       transition: {
-        staggerChildren: staggerDelay ?? spec.stagger,
+        staggerChildren: staggerDelay,
+        delayChildren: delay,
+        when: "beforeChildren" // Show before children start
       },
     },
   }
 
-  useEffect(() => {
-    setMounted(true)
-    if (debug) {
-      mountTimeRef.current = typeof performance !== 'undefined' ? performance.now() : Date.now()
-    }
-  }, [])
-
-  useEffect(() => {
-    if (!mounted) return
-    const el = ref.current
-    if (!el) return
-    const rect = el.getBoundingClientRect()
-    const vh = window.innerHeight || 0
-    const threshold = spec.viewportAmount
-    const inViewNow = rect.top < vh * (1 - threshold) && rect.bottom > vh * threshold
-    setRevealState(inViewNow ? 'show' : 'hidden')
-    if (inViewNow) {
-      hasShownRef.current = true
-    }
-  }, [mounted, spec.viewportAmount])
-
-  useEffect(() => {
-    if (!mounted) return
-    if (isInView) {
-      if (!hasShownRef.current && debug) {
-        const now = typeof performance !== 'undefined' ? performance.now() : Date.now()
-        console.log('[StaggerContainer] first in view:', now, mountTimeRef.current ? now - mountTimeRef.current : undefined)
-      }
-      setRevealState('show')
-      hasShownRef.current = true
-    } else if (!once && hasShownRef.current) {
-      setRevealState('hidden')
-    }
-  }, [isInView, mounted, once])
+  if (!motionEnabled) {
+    return <div className={className}>{children}</div>
+  }
 
   return (
     <motion.div
-      ref={ref}
-      initial={false}
-      animate={shouldAnimate ? revealState : 'show'}
+      initial="hidden"
+      animate={immediate ? "show" : undefined}
+      whileInView={immediate ? undefined : "show"}
+      viewport={immediate ? undefined : {
+        amount: spec.viewportAmount,
+        once,
+        margin: spec.margin
+      }}
       variants={containerVariants}
       className={className}
     >
@@ -236,29 +217,25 @@ export function StaggerContainer({
 interface StaggerItemProps {
   children: ReactNode
   className?: string
+  variant?: RevealVariant
+  distance?: number
+  duration?: number
 }
 
-export function StaggerItem({ children, className = '' }: StaggerItemProps) {
-  const prefersReducedMotion = useReducedMotion()
-  const { forceMotion, boost } = useMemo(getMotionFlags, [])
+export function StaggerItem({
+  children,
+  className = '',
+  variant = 'fadeUp',
+  distance = motionPresets.normal.distance,
+  duration = motionPresets.normal.duration
+}: StaggerItemProps) {
+  const { boost } = useMemo(getMotionFlags, [])
   const spec = boost ? motionPresets.debug : motionPresets.normal
-  const itemVariants: Variants = {
-    hidden: { 
-      opacity: 0, 
-      y: spec.distance,
-    },
-    show: {
-      opacity: 1,
-      y: 0,
-      transition: {
-        duration: spec.duration,
-        ease: spec.ease,
-      },
-    },
-  }
+
+  const itemVariants = getVariants(variant, distance, duration, spec.ease)
 
   return (
-    <motion.div variants={itemVariants} className={className} initial={false}>
+    <motion.div variants={itemVariants} className={className}>
       {children}
     </motion.div>
   )

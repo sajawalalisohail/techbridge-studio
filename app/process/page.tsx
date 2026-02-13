@@ -128,21 +128,21 @@ export default function ProcessPage() {
   return (
     <>
       {/* Hero */}
-      <Section className="pt-32 pb-16">
+      <Section className="pt-24 md:pt-32 pb-8 md:pb-12">
         <Container>
-          <Reveal>
+          <Reveal immediate>
             <p className="text-sm font-medium text-muted-foreground uppercase tracking-wider mb-4">
               Process
             </p>
           </Reveal>
-          <Reveal delay={0.1}>
+          <Reveal immediate delay={0.1}>
             <h1 className="text-display-sm md:text-display font-semibold tracking-tight max-w-3xl mb-6">
               How we work.
             </h1>
           </Reveal>
-          <Reveal delay={0.2}>
+          <Reveal immediate delay={0.2}>
             <p className="text-body-lg text-muted-foreground max-w-2xl">
-              A clear, predictable process that keeps you informed and in control. 
+              A clear, predictable process that keeps you informed and in control.
               No surprises, no scope creep, no disappearing acts.
             </p>
           </Reveal>
@@ -150,7 +150,7 @@ export default function ProcessPage() {
       </Section>
 
       {/* Principles */}
-      <Section size="xs" className="border-y border-border bg-muted">
+      <Section size="xs" className="border-y border-border" style={{ backgroundColor: 'var(--section-surface)' }}>
         <Container>
           <StaggerContainer className="grid grid-cols-2 md:grid-cols-4 gap-8">
             {principles.map((principle) => (

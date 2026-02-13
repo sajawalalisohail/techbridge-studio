@@ -32,7 +32,7 @@ const projects = [
 
 export default function SelectedWork() {
   return (
-    <Section id="work" className="bg-muted">
+    <Section id="work">
       <Container>
         <StaggerContainer className="mb-16">
           <StaggerItem>
@@ -47,15 +47,15 @@ export default function SelectedWork() {
           </StaggerItem>
           <StaggerItem>
             <p className="text-muted-foreground mt-4 max-w-2xl">
-              Representative examples of the systems we build. Each project is custom — 
+              Representative examples of the systems we build. Each project is custom —
               these showcase our approach and capabilities.
             </p>
           </StaggerItem>
         </StaggerContainer>
 
         <StaggerContainer className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {projects.map((project) => (
-            <StaggerItem key={project.id}>
+          {projects.map((project, index) => (
+            <StaggerItem key={project.id} variant={index % 2 === 0 ? 'slideLeft' : 'slideRight'}>
               <Card padding="none" className="overflow-hidden group cursor-pointer">
                 {/* Image Placeholder */}
                 <div className={`aspect-[4/3] bg-gradient-to-br ${project.color} relative overflow-hidden`}>
@@ -64,7 +64,7 @@ export default function SelectedWork() {
                   </div>
                   <div className="absolute inset-0 bg-foreground/0 group-hover:bg-foreground/5 transition-colors duration-300" />
                 </div>
-                
+
                 {/* Content */}
                 <div className="p-6">
                   <div className="flex items-center gap-2 mb-3">
@@ -80,8 +80,8 @@ export default function SelectedWork() {
                   </p>
                   <div className="flex flex-wrap gap-2">
                     {project.tags.map((tag) => (
-                      <span 
-                        key={tag} 
+                      <span
+                        key={tag}
                         className="text-xs text-muted-foreground"
                       >
                         {tag}

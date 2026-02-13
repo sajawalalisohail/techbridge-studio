@@ -86,21 +86,21 @@ export default function ServicesPage() {
   return (
     <>
       {/* Hero */}
-      <Section className="pt-32 pb-16">
+      <Section className="pt-24 md:pt-32 pb-8 md:pb-12">
         <Container>
-          <Reveal>
+          <Reveal immediate>
             <p className="text-sm font-medium text-muted-foreground uppercase tracking-wider mb-4">
               Services
             </p>
           </Reveal>
-          <Reveal delay={0.1}>
+          <Reveal immediate delay={0.1}>
             <h1 className="text-display-sm md:text-display font-semibold tracking-tight max-w-3xl mb-6">
               What we build.
             </h1>
           </Reveal>
-          <Reveal delay={0.2}>
+          <Reveal immediate delay={0.2}>
             <p className="text-body-lg text-muted-foreground max-w-2xl">
-              Four tiers of service, from simple websites to complex platforms. 
+              Four tiers of service, from simple websites to complex platforms.
               Each project is custom-scoped to your needs.
             </p>
           </Reveal>
@@ -132,7 +132,7 @@ export default function ServicesPage() {
                       <p className="text-muted-foreground mb-8">
                         {service.description}
                       </p>
-                      
+
                       <div className="flex flex-wrap gap-6 mb-8">
                         <div>
                           <p className="text-sm text-muted-foreground mb-1">Investment</p>
@@ -170,28 +170,6 @@ export default function ServicesPage() {
       </Section>
 
       {/* Custom Projects */}
-      <Section className="bg-muted">
-        <Container size="sm">
-          <div className="text-center">
-            <Reveal>
-              <h2 className="text-headline-sm font-semibold mb-4">
-                Something else in mind?
-              </h2>
-            </Reveal>
-            <Reveal delay={0.1}>
-              <p className="text-muted-foreground mb-8">
-                These tiers are starting points. Every project is custom-scoped. 
-                If you have something specific in mind, let&apos;s talk.
-              </p>
-            </Reveal>
-            <Reveal delay={0.2}>
-              <Button href="/quote" variant="outline">
-                Describe Your Project
-              </Button>
-            </Reveal>
-          </div>
-        </Container>
-      </Section>
 
       <FinalCTA />
     </>

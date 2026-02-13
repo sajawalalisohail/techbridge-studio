@@ -1,5 +1,5 @@
 import { Metadata } from 'next'
-import { Container, Section, Card, Reveal, StaggerContainer, StaggerItem } from '@/components/ui'
+import { Container, Section, Card, Reveal, StaggerContainer, StaggerItem, Button } from '@/components/ui'
 import { FinalCTA } from '@/components/sections'
 
 export const metadata: Metadata = {
@@ -100,21 +100,21 @@ export default function WorkPage() {
   return (
     <>
       {/* Hero */}
-      <Section className="pt-32 pb-16">
+      <Section className="pt-24 md:pt-32 pb-8 md:pb-12">
         <Container>
-          <Reveal>
+          <Reveal immediate>
             <p className="text-sm font-medium text-muted-foreground uppercase tracking-wider mb-4">
               Work
             </p>
           </Reveal>
-          <Reveal delay={0.1}>
+          <Reveal immediate delay={0.1}>
             <h1 className="text-display-sm md:text-display font-semibold tracking-tight max-w-3xl mb-6">
               Sample builds.
             </h1>
           </Reveal>
-          <Reveal delay={0.2}>
-            <p className="text-body-lg text-muted-foreground max-w-2xl">
-              Representative examples of the systems we build. Each project is custom — 
+          <Reveal immediate delay={0.2}>
+            <p className="text-body-lg text-muted-foreground max-w-2xl mb-8">
+              Representative examples of the systems we build. Each project is custom —
               these showcase our approach and capabilities.
             </p>
           </Reveal>
@@ -122,19 +122,24 @@ export default function WorkPage() {
       </Section>
 
       {/* Projects Grid */}
-      <Section size="sm">
+      <Section className="pb-16 md:pb-24 pt-0">
         <Container>
-          <StaggerContainer className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {projects.map((project) => (
-              <StaggerItem key={project.id}>
-                <Card padding="none" className="overflow-hidden group">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            {projects.map((project, index) => (
+              <Reveal
+                key={project.id}
+                immediate={index < 2}
+                delay={index < 2 ? index * 0.1 : (index % 2) * 0.1}
+                className="h-full"
+              >
+                <Card padding="none" className="overflow-hidden group h-full">
                   {/* Image Placeholder */}
                   <div className={`aspect-video bg-gradient-to-br ${project.color} relative overflow-hidden`}>
                     <div className="absolute inset-0 flex items-center justify-center">
                       <span className="text-8xl opacity-10">◈</span>
                     </div>
                   </div>
-                  
+
                   {/* Content */}
                   <div className="p-8">
                     <div className="flex items-center gap-2 mb-4">
@@ -148,7 +153,7 @@ export default function WorkPage() {
                     <p className="text-muted-foreground mb-6">
                       {project.description}
                     </p>
-                    
+
                     {/* Features */}
                     <div className="mb-6">
                       <h3 className="text-sm font-medium mb-3">Key Features</h3>
@@ -165,8 +170,8 @@ export default function WorkPage() {
                     {/* Tags */}
                     <div className="flex flex-wrap gap-2 pt-4 border-t border-border">
                       {project.tags.map((tag) => (
-                        <span 
-                          key={tag} 
+                        <span
+                          key={tag}
                           className="text-xs text-muted-foreground bg-muted px-2 py-1 rounded"
                         >
                           {tag}
@@ -175,26 +180,13 @@ export default function WorkPage() {
                     </div>
                   </div>
                 </Card>
-              </StaggerItem>
+              </Reveal>
             ))}
-          </StaggerContainer>
+          </div>
         </Container>
       </Section>
 
       {/* Note */}
-      <Section size="sm" className="bg-muted">
-        <Container size="sm">
-          <div className="text-center">
-            <Reveal>
-              <p className="text-muted-foreground">
-                <strong className="text-foreground">Note:</strong> These are representative samples. 
-                Due to NDAs and client privacy, we can&apos;t show all our work publicly. 
-                We&apos;re happy to discuss relevant experience during our discovery call.
-              </p>
-            </Reveal>
-          </div>
-        </Container>
-      </Section>
 
       <FinalCTA />
     </>

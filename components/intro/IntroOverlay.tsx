@@ -1,7 +1,7 @@
 'use client'
 
 import { useRef, useEffect } from 'react'
-import { gsap } from 'gsap'
+import { animate } from 'framer-motion'
 import { useLenis } from '@/hooks/useLenis'
 
 interface IntroOverlayProps {
@@ -12,7 +12,6 @@ export default function IntroOverlay({ onComplete }: IntroOverlayProps) {
   const overlayRef = useRef<HTMLDivElement>(null)
   const textRef = useRef<HTMLDivElement>(null)
   const subtextRef = useRef<HTMLDivElement>(null)
-  const timelineRef = useRef<gsap.core.Timeline | null>(null)
   const { lenis } = useLenis()
 
   useEffect(() => {
@@ -31,58 +30,41 @@ export default function IntroOverlay({ onComplete }: IntroOverlayProps) {
     lenis?.stop()
 
     // Set initial states
-    gsap.set(text, { opacity: 0, scale: 0.9 })
-    gsap.set(subtext, { opacity: 0, y: 15 })
-    gsap.set(overlay, { yPercent: 0 })
+    text.style.opacity = '0'
+    text.style.transform = 'scale(0.9)'
+    subtext.style.opacity = '0'
+    subtext.style.transform = 'translateY(15px)'
+    overlay.style.transform = 'translateY(0%)'
 
-    // Create timeline with fallback timeout
-    const tl = gsap.timeline({
-      onComplete: () => {
+    const runAnimation = async () => {
+      try {
+        await animate([
+          [text, { opacity: 1, scale: 1 }, { duration: 0.7, ease: 'easeOut', delay: 0.2 }],
+          [text, { backgroundPosition: '100% 0' }, { duration: 0.6, ease: 'easeInOut', at: '-0.2' }],
+          [subtext, { opacity: 1, y: 0 }, { duration: 0.4, ease: 'easeOut', at: '-0.3' }],
+          [overlay, { y: '-100%' }, { duration: 0.7, ease: 'easeInOut', at: '+0.3' }] // +0.3 delay acts as the generic wait
+        ])
+
+        lenis?.start()
+        onComplete?.()
+      } catch (e) {
+        // interrupted
         lenis?.start()
         onComplete?.()
       }
-    })
+    }
 
-    timelineRef.current = tl
-
-    tl
-      .to(text, {
-        opacity: 1,
-        scale: 1,
-        duration: 0.7,
-        ease: 'power2.out',
-        delay: 0.2,
-      })
-      .to(text, {
-        backgroundPosition: '100% 0',
-        duration: 0.6,
-        ease: 'power1.inOut',
-      }, '-=0.2')
-      .to(subtext, {
-        opacity: 1,
-        y: 0,
-        duration: 0.4,
-        ease: 'power2.out',
-      }, '-=0.3')
-      .to({}, { duration: 0.3 })
-      .to(overlay, {
-        yPercent: -100,
-        duration: 0.7,
-        ease: 'power3.inOut',
-      })
+    runAnimation()
 
     // Fallback: force complete after 4 seconds max
     const fallbackTimer = setTimeout(() => {
-      if (timelineRef.current) {
-        timelineRef.current.kill()
-      }
-      gsap.set(overlay, { yPercent: -100, opacity: 0 })
+      overlay.style.opacity = '0'
+      overlay.style.pointerEvents = 'none'
       lenis?.start()
       onComplete?.()
     }, 4000)
 
     return () => {
-      tl.kill()
       clearTimeout(fallbackTimer)
     }
   }, [lenis, onComplete])

@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect } from 'react'
-import { gsap } from 'gsap'
+import { animate } from 'framer-motion'
 
 const INTRO_KEY = 'tb_intro_played'
 
@@ -28,10 +28,15 @@ const lockScroll = () => {
   }
 }
 
+const INTRO_COMPLETE_EVENT = 'tb-intro-complete'
+
 const hideOverlay = (overlay: HTMLElement | null) => {
   if (!overlay) return
   overlay.style.pointerEvents = 'none'
   overlay.style.display = 'none'
+  if (typeof window !== 'undefined') {
+    window.dispatchEvent(new CustomEvent(INTRO_COMPLETE_EVENT))
+  }
 }
 
 export default function IntroOverlayClient() {
@@ -40,9 +45,9 @@ export default function IntroOverlayClient() {
 
     const overlay = document.querySelector<HTMLElement>('[data-intro-overlay]')
     const text = overlay?.querySelector<HTMLElement>('[data-intro-text]')
-    const wipe = overlay?.querySelector<HTMLElement>('[data-intro-wipe]')
+    const sweep = overlay?.querySelector<HTMLElement>('[data-intro-sweep]')
 
-    if (!overlay || !text || !wipe) return
+    if (!overlay || !text) return
 
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
     const hasPlayed = sessionStorage.getItem(INTRO_KEY) === '1'
@@ -54,47 +59,38 @@ export default function IntroOverlayClient() {
 
     const unlockScroll = lockScroll()
 
-    const ctx = gsap.context(() => {
-      gsap.set(wipe, { autoAlpha: 0, xPercent: -120 })
+    const runAnimation = async () => {
+      try {
+        // Step 1: Fade in the text
+        await animate(text, { opacity: 1, y: 0, scale: 1 }, { duration: 0.5, ease: 'easeOut' })
 
-      const tl = gsap.timeline({
-        defaults: { ease: 'power3.out' },
-        onComplete: () => {
-          sessionStorage.setItem(INTRO_KEY, '1')
-          unlockScroll()
-          hideOverlay(overlay)
-        },
-      })
+        // Step 2: Trigger the sweep animation via CSS class
+        if (sweep) {
+          sweep.classList.add('sweeping')
+          // Wait for sweep animation to complete (1s)
+          await new Promise(resolve => setTimeout(resolve, 1000))
+          sweep.classList.remove('sweeping')
+          sweep.classList.add('sweep-done')
+        }
 
-      tl.to(text, {
-        autoAlpha: 1,
-        y: 0,
-        scale: 1,
-        duration: 0.5,
-      })
-        .to(
-          wipe,
-          {
-            autoAlpha: 0.85,
-            xPercent: 120,
-            duration: 0.6,
-            ease: 'power1.inOut',
-          },
-          '-=0.2'
-        )
-        .to(
-          overlay,
-          {
-            yPercent: -100,
-            duration: 0.6,
-            ease: 'power3.inOut',
-          },
-          '+=0.15'
-        )
-    }, overlay)
+        // Step 3: Small pause then slide overlay up
+        await new Promise(resolve => setTimeout(resolve, 150))
+        await animate(overlay, { y: '-100%' }, { duration: 0.6, ease: 'easeInOut' })
+
+        sessionStorage.setItem(INTRO_KEY, '1')
+        unlockScroll()
+        hideOverlay(overlay)
+      } catch (e) {
+        // Handle animation interrupt or error
+        unlockScroll()
+        hideOverlay(overlay)
+      }
+    }
+
+    runAnimation()
 
     return () => {
-      ctx.revert()
+      // In case of unmount during animation
       unlockScroll()
     }
   }, [])

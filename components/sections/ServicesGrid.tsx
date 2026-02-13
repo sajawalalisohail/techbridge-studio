@@ -1,4 +1,5 @@
 import { Container, Section, Card, CardTitle, CardDescription, Button, StaggerContainer, StaggerItem } from '@/components/ui'
+import NeuralAttractorCard from '@/components/three/NeuralAttractorCard'
 
 const services = [
   {
@@ -58,30 +59,32 @@ export default function ServicesGrid() {
 
         <StaggerContainer className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {services.map((service) => (
-            <StaggerItem key={service.id}>
-              <Card className="h-full flex flex-col" padding="lg">
-                <div className="flex items-start justify-between mb-4">
-                  <span className="text-3xl">{service.icon}</span>
-                  <span className="text-xs font-medium text-muted-foreground bg-background px-3 py-1 rounded-full border border-border">
-                    Tier {service.tier}
-                  </span>
-                </div>
-                <CardTitle className="mb-3">{service.title}</CardTitle>
-                <CardDescription className="mb-6 flex-1">
-                  {service.description}
-                </CardDescription>
-                <ul className="space-y-2 mb-6">
-                  {service.features.map((feature) => (
-                    <li key={feature} className="text-sm text-muted-foreground flex items-center gap-2">
-                      <span className="w-1 h-1 bg-foreground rounded-full" />
-                      {feature}
-                    </li>
-                  ))}
-                </ul>
-                <div className="pt-4 border-t border-border mt-auto">
-                  <p className="font-semibold">{service.price}</p>
-                </div>
-              </Card>
+            <StaggerItem key={service.id} variant="scaleIn" className="h-full">
+              <NeuralAttractorCard className="h-full">
+                <Card className="h-full flex flex-col" padding="lg">
+                  <div className="flex items-start justify-between mb-4">
+                    <span className="text-3xl">{service.icon}</span>
+                    <span className="text-xs font-medium text-muted-foreground bg-background px-3 py-1 rounded-full border border-border">
+                      Tier {service.tier}
+                    </span>
+                  </div>
+                  <CardTitle className="mb-3">{service.title}</CardTitle>
+                  <CardDescription className="mb-6 flex-1">
+                    {service.description}
+                  </CardDescription>
+                  <ul className="space-y-2 mb-6">
+                    {service.features.map((feature) => (
+                      <li key={feature} className="text-sm text-muted-foreground flex items-center gap-2">
+                        <span className="w-1 h-1 bg-foreground rounded-full" />
+                        {feature}
+                      </li>
+                    ))}
+                  </ul>
+                  <div className="pt-4 border-t border-border mt-auto">
+                    <p className="font-semibold">{service.price}</p>
+                  </div>
+                </Card>
+              </NeuralAttractorCard>
             </StaggerItem>
           ))}
         </StaggerContainer>
@@ -97,3 +100,4 @@ export default function ServicesGrid() {
     </Section>
   )
 }
+

@@ -1,10 +1,12 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
 import Container from '@/components/ui/Container'
 import Button from '@/components/ui/Button'
+import { useLenis } from '@/hooks/useLenis'
 
 const navItems = [
   { label: 'Services', href: '/services' },
@@ -13,28 +15,49 @@ const navItems = [
 ]
 
 export default function Navbar() {
-  const [isHeroVisible, setIsHeroVisible] = useState(true)
+  const pathname = usePathname()
+  const { lenis } = useLenis()
+  // "isExpanded" maps to the previous "isHeroVisible" concept (Large Transparent Nav)
+  // Default to true (expanded) at start
+  const [isExpanded, setIsExpanded] = useState(true)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
-  const observerRef = useRef<IntersectionObserver | null>(null)
 
   useEffect(() => {
-    const hero = document.getElementById('hero')
-    if (!hero || typeof IntersectionObserver === 'undefined') return
+    // Reset mobile menu on route change
+    setIsMobileMenuOpen(false)
 
-    observerRef.current?.disconnect()
-    observerRef.current = new IntersectionObserver(
-      ([entry]) => {
-        setIsHeroVisible(entry.isIntersecting)
-      },
-      {
-        root: null,
-        threshold: 0.25,
+    // On route change, reset to expanded (we scroll to top)
+    setIsExpanded(true)
+
+    // Function to check scroll position and update navbar state
+    const checkScroll = () => {
+      const scrollY = lenis ? lenis.scroll : window.scrollY
+      setIsExpanded(scrollY < 50)
+    }
+
+    // Defer initial check to allow Lenis to complete scroll-to-top
+    const timeoutId = setTimeout(checkScroll, 50)
+
+    // Setup scroll listener
+    const handleScroll = () => {
+      checkScroll()
+    }
+
+    if (lenis) {
+      lenis.on('scroll', handleScroll)
+    } else {
+      window.addEventListener('scroll', handleScroll, { passive: true })
+    }
+
+    return () => {
+      clearTimeout(timeoutId)
+      if (lenis) {
+        lenis.off('scroll', handleScroll)
+      } else {
+        window.removeEventListener('scroll', handleScroll)
       }
-    )
-
-    observerRef.current.observe(hero)
-    return () => observerRef.current?.disconnect()
-  }, [])
+    }
+  }, [lenis, pathname])
 
   // Prevent body scroll when mobile menu is open
   useEffect(() => {
@@ -51,21 +74,20 @@ export default function Navbar() {
   return (
     <>
       <header
-        className="fixed top-0 left-0 right-0 z-50"
+        className="fixed top-0 left-0 right-0 z-50 pointer-events-none"
       >
         <div className="h-20" aria-hidden="true" />
 
-        {/* State A: Full navbar (hero in view) */}
+        {/* State A: Full navbar (Expanded) */}
         <div
-          className={`absolute inset-x-0 top-0 transition-all duration-300 ${
-            isHeroVisible ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-2 pointer-events-none'
-          }`}
+          className={`absolute inset-x-0 top-0 transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${isExpanded ? 'opacity-100 translate-y-0 pointer-events-auto' : 'opacity-0 -translate-y-4 pointer-events-none'
+            }`}
         >
           <Container>
             <nav className="flex items-center justify-between h-20">
               {/* Logo */}
-              <Link 
-                href="/" 
+              <Link
+                href="/"
                 className="text-xl font-semibold tracking-tight hover:opacity-70 transition-opacity"
               >
                 TechBridge
@@ -94,11 +116,11 @@ export default function Navbar() {
               {/* Mobile Menu Button */}
               <button
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                className="md:hidden relative w-10 h-10 flex items-center justify-center"
+                className="md:hidden relative w-10 h-10 flex items-center justify-center p-2 rounded-md hover:bg-muted/50 transition-colors pointer-events-auto"
                 aria-label="Toggle menu"
                 aria-expanded={isMobileMenuOpen}
               >
-                <div className="flex flex-col gap-1.5">
+                <div className="flex flex-col gap-1.5 w-full items-center justify-center">
                   <motion.span
                     animate={{
                       rotate: isMobileMenuOpen ? 45 : 0,
@@ -123,14 +145,13 @@ export default function Navbar() {
           </Container>
         </div>
 
-        {/* State B: Compact boxed/pill navbar */}
+        {/* State B: Compact boxed/pill navbar (Collapsed) */}
         <div
-          className={`absolute inset-x-0 top-3 transition-all duration-300 ${
-            isHeroVisible ? 'opacity-0 -translate-y-2 pointer-events-none' : 'opacity-100 translate-y-0'
-          }`}
+          className={`absolute inset-x-0 top-3 transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${isExpanded ? 'opacity-0 -translate-y-2 pointer-events-none' : 'opacity-100 translate-y-0 pointer-events-auto'
+            }`}
         >
           <Container>
-            <nav className="mx-auto w-fit flex h-14 items-center justify-center rounded-full border border-border bg-background/80 px-5 md:px-7 backdrop-blur-sm shadow-sm">
+            <nav className="mx-auto w-fit flex h-14 items-center justify-center rounded-full border border-border bg-background/80 px-5 md:px-7 backdrop-blur-md shadow-sm">
               <div className="hidden md:flex items-center gap-6">
                 <Link
                   href="/"
@@ -157,7 +178,7 @@ export default function Navbar() {
 
               <button
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                className="md:hidden relative w-9 h-9 flex items-center justify-center"
+                className="md:hidden relative w-9 h-9 flex items-center justify-center pointer-events-auto"
                 aria-label="Toggle menu"
                 aria-expanded={isMobileMenuOpen}
               >
@@ -195,16 +216,40 @@ export default function Navbar() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
-            className="fixed inset-0 z-40 bg-background md:hidden"
+            className="fixed inset-0 z-[60] bg-background md:hidden"
           >
             <Container className="pt-24 pb-8 h-full flex flex-col">
+              <button
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="absolute top-6 right-6 w-10 h-10 flex items-center justify-center"
+              >
+                {/* Close Icon for internal menu context */}
+                <div className="flex flex-col gap-0 items-center justify-center">
+                  <span className="block w-6 h-0.5 bg-foreground rotate-45 translate-y-[2px]" />
+                  <span className="block w-6 h-0.5 bg-foreground -rotate-45 -translate-y-[2px]" />
+                </div>
+              </button>
+
               <nav className="flex flex-col gap-2 flex-1">
+                <motion.div
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0 }}
+                >
+                  <Link
+                    href="/"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="block py-4 text-3xl font-medium hover:text-muted-foreground transition-colors"
+                  >
+                    Home
+                  </Link>
+                </motion.div>
                 {navItems.map((item, index) => (
                   <motion.div
                     key={item.href}
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: index * 0.1 }}
+                    transition={{ delay: (index + 1) * 0.1 }}
                   >
                     <Link
                       href={item.href}
@@ -219,10 +264,10 @@ export default function Navbar() {
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.3 }}
+                transition={{ delay: 0.4 }}
               >
-                <Link 
-                  href="/quote" 
+                <Link
+                  href="/quote"
                   onClick={() => setIsMobileMenuOpen(false)}
                   className="inline-flex items-center justify-center font-medium transition-all duration-300 ease-smooth rounded-full bg-foreground text-background hover:opacity-90 h-14 px-10 text-base w-full"
                 >

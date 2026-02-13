@@ -16,7 +16,7 @@ const values = [
 
 export default function TrustStrip() {
   return (
-    <Section size="xs" className="border-y border-border bg-muted">
+    <Section size="xs" className="border-y border-border" style={{ backgroundColor: 'var(--section-surface)' }}>
       <Container>
         <div className="flex flex-col md:flex-row items-center justify-between gap-8">
           <Reveal>
@@ -40,7 +40,7 @@ export default function TrustStrip() {
 
 export function ValuesStrip() {
   return (
-    <Section size="xs" className="border-y border-border bg-muted">
+    <Section size="xs" className="border-y border-border" style={{ backgroundColor: 'var(--section-surface)' }}>
       <Container>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
           {values.map((item) => (
